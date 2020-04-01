@@ -52,7 +52,7 @@ phi_S = 0.91
 ```
 
 ```{python}
-update = {"soil_feedback" : "C",
+update = {
           "r_l" : 1.5,          
           "alpha" : 0.04,
           "beta" : 0.5,
@@ -424,8 +424,4 @@ plt.axhline(p.mean_G_l(), ls=  '--')
 ```{python}
 plt.plot(p.t_p[:], G_u_mean_list[:])
 plt.axhline(p.mean_G_u(), ls=  '--')
-```
-
-```{python}
-
 ```
