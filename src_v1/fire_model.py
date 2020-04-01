@@ -736,8 +736,6 @@ def all_params(update = {}):
         "ti" : 1000,
         "minP" : 0.9,
         "seed" : 0,
-        "slope" : 0,
-        "slope_type" : "zero",
         "ignition_type" : "series",
         "RI" : 60,        
         "severity_type" : "fixed",

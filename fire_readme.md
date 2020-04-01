@@ -16,16 +16,8 @@ biomass growth on smaller timesteps.
 
 
 ###  Version control the fire code
-- trim unused stuff
-    - soil_feedback  : str
-    - Describes the soil moisture feedback to fire
-      -  "C" : constant
-      -  "S" : severity
-      -  "F" : includes fire frequency
-
 
 - document variable names and units
-  - call it version1
   - consider all variables that should be saved; those that can be removed.
   - folders:
   - src_v1
