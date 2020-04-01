@@ -3,3 +3,9 @@
 *.ipynb
 *.pkl
 *.Rhistory
+fire_analytic/*
+
+!fire_analytic/analytic_two_layer.tex
+fire_mathematica/
+fire_writing/
+ref_fire/
