@@ -3,7 +3,6 @@ from fire_model import *
 Stand alone functions only
 """  
 
-
 ##### Mean biomass, and biomass before/after fires ##### 
 def G_prefire( r, k, RI, severity):
     """

@@ -13,56 +13,106 @@ jupyter:
 ---
 
 ```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-# %matplotlib inline
+# %autosave 0
+```
+
+```{python}
 import sys
-import time
-import itertools
-import multiprocessing as mp
-import copy
-import math
-import scipy
 
 sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
 
-mymodules = ['plot_config', "fire_model", "fire_plot", "fire_analytic" ]
+mymodules = ['plot_config', "fire_model", "fire_utility",
+             "fire_plot", "fire_analytic" ]
 
 for mod in mymodules:
     if mod in sys.modules:
         del sys.modules[mod]
 
+
 from plot_config import *
 from fire_model import *
 from fire_analytic import *
+from fire_utility import *
 from fire_plot import *
 ```
 
 ```{python}
-# We can predict the max severity and min return interval to sustain biomass in the upper canopy
+# # %matplotlib inline
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import pandas as pd
+# import sys
+# import time
+# import itertools
+# import multiprocessing as mp
+# import copy
+# import math
+# import scipy
 
-p = RCSR()
-update = {"r_u" :0.15,
-          "r_l" : 0.45,
-          "k_u" : 20,
-          "k_l" : 5,
-          "S" : 0.5,
-          "beta" : 1,
-          "alpha" : 0.01,
-          "G_lo" : p.k_l/100., 
-          "G_uo" : p.k_u/100.,           
-          "soil_feedback" : "C",          
-          "ti" : 0, 
-          "tmax" : 100,
-          "RI" : 100,
-          "severity" : 0.5,
-          "dt" : 0.01,
-          "dt_p" : 0.1
-         }
-p = RCSR(update)
+# sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
 
-p.run()
+# mymodules = ['plot_config', "fire_model", "fire_plot", "fire_analytic" ]
+
+# for mod in mymodules:
+#     if mod in sys.modules:
+#         del sys.modules[mod]
+
+# from plot_config import *
+# from fire_model import *
+# from fire_analytic import *
+# from fire_plot import *
+```
+
+###  Maximum severity / minimm return interval to sustain upper canopy biomass
+
+```{python}
+params =  {
+    "alpha" : 0.04,
+    "beta" : 0.5,
+    "k_u" : 20.,
+    "k_l" : 5.,    
+    "r_u" : 0.25,
+    "r_l" : 1.5,                    
+    "S" : 0.5,
+    "dt" : 0.01,
+    "dt_p" : 0.1,            
+    "seed" : 0,
+    "ti" : 1000,        
+    "tmax" : 3000,      
+    "RI" : 20,
+    "ignition_type" : "fixed",   
+    "chi" : 1,                           
+    "severity_type" : "fixed",
+    "severity" : 0.7,
+    "std_severity" : 0.1,
+    "r" : 0.5, 
+    "a" : 0.01,
+    "b" : 0.99
+} 
+p = param_class(params)
+```
+
+```{python}
+# p = RCSR()
+# update = {"r_u" :0.15,
+#           "r_l" : 0.45,
+#           "k_u" : 20,
+#           "k_l" : 5,
+#           "S" : 0.5,
+#           "beta" : 1,
+#           "alpha" : 0.01,          
+#           "soil_feedback" : "C",          
+#           "ti" : 0, 
+#           "tmax" : 100,
+#           "RI" : 100,
+#           "severity" : 0.5,
+#           "dt" : 0.01,
+#           "dt_p" : 0.1
+#          }
+# p = RCSR(update)
+
+# p.run()
+
 
 RIs = np.arange(0, 100, .1)
 severities = p.max_severity(p.r_u*p.S**p.beta, RIs)
@@ -193,6 +243,10 @@ if G_l_postfire>0:
 ```
 
 ## Things are slow to converge near the stability boundary
+
+```{python}
+
+```
 
 ```{python}
 

@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import sys
 import time
 import itertools
 import multiprocessing as mp
@@ -48,7 +47,7 @@ class RCSR:
 
         np.random.seed(int(self.seed) )
                
-        if self.ignition_type == "series": 
+        if self.ignition_type == "fixed": 
             self.ignition_list = self.times[::self.RI][1:]
         
         elif self.ignition_type == "random":
@@ -132,7 +131,7 @@ class RCSR:
         
         t =  round(self.t,4)
         
-        if (self.ignition_type == "series"):
+        if (self.ignition_type == "fixed"):
             
             if (t in self.ignition_list):
                 u_severity, l_severity = self.severity_list[self.fires]
@@ -147,10 +146,7 @@ class RCSR:
             G_u = self.G_u*(1 - u_severity)
             G_l = self.G_l*(1 - l_severity)
             
-            # initial_G = self.G_l + self.G_u
-            # final_G = G_l + G_u
-            # biomass_change = (final_G - initial_G)/initial_G
-            # self.cat_severity = self.severity_threshold(-biomass_change)
+
             
             steps_since_fire = 1+ int(self.time_past_fire/self.dt_p)
             G_u_mean_c = np.mean(self.G_u_list[-steps_since_fire:])
@@ -196,31 +192,24 @@ class RCSR:
 
     def G_l_ignite_threshold(self):
         """
-        
+        Ignition probability, prescribed as 1/RI
         """            
-        
-        RI_l= self.RI + self.chi*self.RI - \
+        RI_l = self.RI + self.chi*self.RI - \
             self.chi*self.RI/self.k_l*self.G_l
         
         p = 1/RI_l
     
         return  p
 
-       
 
     def random_ignition(self):
         """
-        Ignition with probability 'p'
+        Predict fire ignition with probability 'p'
         """
-
         ignite = self.ignition_list[int(self.t)]     
         
         if self.ignition_type == "random":
             p = self.ignite_threshold()
-        elif self.ignition_type == "censor":
-            p = self.censor_ignite_threshold()
-        elif self.ignition_type == "G_u":
-            p = self.G_u_ignite_threshold()
         elif self.ignition_type == "G_l":
             p = self.G_l_ignite_threshold()            
 
@@ -231,16 +220,7 @@ class RCSR:
             l_severity, u_severity = 0,0 
         
         return u_severity, l_severity
-    
-    def severity_threshold(self, severity):
-        """
-        """
-        if severity < 0.5:
-            return 0
-        elif severity < 0.75:
-            return 1
-        else:
-            return 2
+
              
     def run(self):
         """
@@ -290,12 +270,12 @@ class RCSR:
         to =np.where(self.t_p >= self.record.iloc[0]["year"])[0][0]
 
         G_u_list = self.G_u_list[to:to+(int)(self.RI/self.dt_p)]
-    
+        G_l_list = self.G_l_list[to:to+(int)(self.RI/self.dt_p)]
 
         self.G_u_min_c = np.min(G_u_list)
         self.G_u_mean_c = np.mean(G_u_list)
         
-        G_l_list = self.G_l_list[to:to+(int)(self.RI/self.dt_p)]
+        
         self.G_l_min_c =np.min(G_l_list)    
         self.G_l_max_c =np.min(G_l_list)/(1-self.severity)   
         self.G_l_mean_c =np.mean(G_l_list)
@@ -396,7 +376,7 @@ class RCSR:
 
     def k_lp(self, recomp):
         """
-        Computes the modified lower canopy carrying capacity as:
+        Computes the modified lower canopy carrying capacity (kg/m2) as:
 
             k_lp  = k_l r_lp / (r_l S**beta)
 
@@ -674,19 +654,19 @@ def all_params(update = {}):
     params =  {
         "alpha" : 0.05,
         "beta" : 1,
-        "chi" : 1,
-        "dt" : 0.1,
-        "dt_p" : 0.1,            
-        "ignition_type" : "series",
         "k_u" : 20.,
         "k_l" : 5.,    
         "r_u" : 0.25,
-        "r_l" : 1.5,          
+        "r_l" : 1.5,                    
         "S" : 0.5,
-        "RI" : 60,           
+        "dt" : 0.1,
+        "dt_p" : 0.1,            
         "seed" : 0,
         "ti" : 1000,        
-        "tmax" : 3000,                    
+        "tmax" : 3000,      
+        "RI" : 60,
+        "ignition_type" : "fixed",   
+        "chi" : 1,                           
         "severity_type" : "fixed",
         "severity" : 0.5,
         "std_severity" : 0.1,
@@ -952,3 +932,6 @@ def compute_errors_mean(p):
     dfl = a.append(c).append(e).append(pe)
     
     return df, dfl    
+
+####################################################################
+####################################################################

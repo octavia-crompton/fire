@@ -106,7 +106,7 @@ Equation \ref{G_u}  is the logistic equation, and  has an analytic solution:
 
 where  $G_{uo}$  is the initial biomass, and $r'_u =  r_u S^\beta  $  combines the growth rate and growth-limiting factor into an `effective` growth rate.  
 
-If time is measured as the time since the previous fire, then $G_u(t = 0) = G_uo$ and  $G_u(t = \xi) = G_{u,max}$  (once the system is in a dynamic steady state):
+If time is measured as the time since the previous fire, then $G_u(t = 0) = G_{uo}$ and  $G_u(t = \xi) = G_{u,max}$  (once the system is in a dynamic steady state):
 
 \begin{equation}
     \frac{G_{u,max}}{G_{uo}} = \frac{1}{\phi_R} =  \frac{k_u }{G_{uo} +(k_u-G_{uo}) e^{-r'_u \xi}}
@@ -169,7 +169,7 @@ Substitute Equation  \ref{G_uo} and simplify:
 \end{equation}
 
 
-\subsection*{Minimum return interval to sustain upper canopy biomass}
+\subsection*{Stability: conditions to sustain upper canopy biomass}
 
 Requiring that $\hat{G}_u >0$ in Equation \ref{G_u_mean} yields:
 
@@ -338,11 +338,6 @@ Using the definition of $Z$:
 The numerator and denominator are both always positive (because $- \log(1-\phi_S) > 0$), so we expect a minima in $\hat G_l$ for $\alpha > 0$.
 
  $\frac{d \hat{G}_l}{dS}$ has a discontinuity at  $ S = \big( - \frac{1}{r_l \xi }\log (1 - \phi_S)\big)^{1/\beta}$, where $G_l$ has a maximum value.   
- %The value of $G_l$ at this discontinuity is:
-%
-%\begin{equation}
-%\hat G_{l,max}
-%\end{equation}
 
 
 \subsection*{Maximum return interval for a lower canopy}

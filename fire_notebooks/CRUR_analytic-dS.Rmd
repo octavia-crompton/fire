@@ -15,21 +15,22 @@ jupyter:
 Explore sensitivity to varying soil moisture, growth-limiting factor, etc.
 
 ```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-# %matplotlib inline
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import pandas as pd
+# # %matplotlib inline
+# import sys
+# import time
+# import itertools
+# import multiprocessing as mp
+# import copy
+# import math
 import sys
-import time
-import itertools
-import multiprocessing as mp
-import copy
-import math
-from statsmodels.graphics.tsaplots import plot_acf
 
 sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
 
-mymodules = ['plot_config', "fire_model", "fire_plot", "fire_analytic" ]
+mymodules = ['plot_config', "fire_model", "fire_utility",
+             "fire_plot", "fire_analytic" ]
 
 for mod in mymodules:
     if mod in sys.modules:
@@ -39,84 +40,97 @@ for mod in mymodules:
 from plot_config import *
 from fire_model import *
 from fire_analytic import *
+from fire_utility import *
 from fire_plot import *
 ```
 
 ```{python}
-RI = 10
-phi_S = 0.91
+params =  {
+    "alpha" : 0.04,
+    "beta" : 0.5,
+    "k_u" : 20.,
+    "k_l" : 5.,    
+    "r_u" : 0.25,
+    "r_l" : 1.5,                    
+    "S" : 0.5,
+    "dt" : 0.01,
+    "dt_p" : 0.1,            
+    "seed" : 0,
+    "ti" : 1000,        
+    "tmax" : 3000,      
+    "RI" : 20,
+    "ignition_type" : "fixed",   
+    "chi" : 1,                           
+    "severity_type" : "fixed",
+    "severity" : 0.7,
+    "std_severity" : 0.1,
+    "r" : 0.5, 
+    "a" : 0.01,
+    "b" : 0.99
+} 
+
 ```
 
 ```{python}
-update = {
-          "r_l" : 1.5,          
-          "alpha" : 0.04,
-          "beta" : 0.5,
-          "ti" : 1000, 
-          "tmax" : 1000,
-          "RI" : 20,
-          "severity" : 0.7,
-          "dt" : 0.01,
-          "dt_p" : 0.1,
-          "seed" : 0,
-          "S" : 0.5
-         }
+p = param_class(params)
+```
+
+## Check how parameters differ from the fire model defaults
+
+```{python}
+
+def difference(a, b):
+    if type(a) in  [int, float]:
+        return round(a-b, 8)
+    else:
+        return '/'.join([a,b])
+ 
+value = { k : difference(params[k], all_params()[k])  for k in set(params) 
+        if params[k] != all_params()[k]}
+    
 ```
 
 ```{python}
-# This code block is meant to show that we can predict the max severity and 
-# min frequency to sustain biomass in the upper canopy
+# p = RCSR()
+# p = RCSR(params)
+# p.run()
 
 
-p = RCSR()
-p = RCSR(update)
-p.run()
-
-print ("The minimum return interval with severity = {0} is {1:.2f} years".format(p.severity,p.min_RI_u()))
-print ("The maximum severity with RI = {0} years is {1:.4f}".format(p.RI, p.max_severity_u()))
 ```
 
 ```{python}
-p.record["error"] = (p.mean_G_u()- p.record.G_u_mean)/p.mean_G_u()*100
-p.record.tail()
+# print_limits(p)
 ```
 
 ```{python}
-canopy_plot(p, nfire = 5)
+# canopy_plot(p, nfire = 5)
 ```
 
 ```{python}
 fig, axes = plt.subplots(1, 2, figsize = (13, 4))
 
-r_u = 0.25
-r_l = 2
-k_l = 5
-k_u = 20
-beta = 0.5
-RI = 20
-severity = 0.6
-alpha = 0.05
 S = np.arange(0.01, 1, .001)
 
 for beta in np.arange(0.1, 1.1, 0.3):
     beta = np.round(beta, 1)
     
-    ax = axes[0]
-    
-    G_u_mean = mean_G_u(r_u ,  k_u , S, beta , RI , severity)
-    ax.plot(S,G_u_mean, label = beta)
+    ax = axes[0]    
+    G_u_mean = mean_G_u(p.r_u ,  p.k_u , S, beta , p.RI , p.severity)
+    ax.plot(S, G_u_mean, label = beta)
     
     ax = axes[1]
     
-    G_l_mean =   mean_G_l(r_l, r_u, k_l, k_u, S , beta, alpha , RI , severity )
+    G_l_mean = mean_G_l(p.r_l, p.r_u, p.k_l, p.k_u, S, 
+                        beta, p.alpha , RI , severity )
     G_l_mean[G_l_mean == 0] = np.nan
     ax.plot(S,G_l_mean, label = beta)
 
 axes[0].legend(title =r"$\beta$")
-axes[1].legend(title =r"$\beta$")
-axes[0].set_xlabel("S")
-axes[0].set_ylabel("$G_u$")
-axes[1].set_ylabel("$G_l$")
+# axes[1].legend(title =r"$\beta$")
+axes[0].set_xlabel("$S$")
+axes[1].set_xlabel("$S$")
+axes[0].set_ylabel("$\hat G_u$")
+axes[1].set_ylabel("$\hat G_l$")
 
 ```
 
