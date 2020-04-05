@@ -26,7 +26,7 @@
  - Test whether _G\_u_ and _G\_l_ will eventually converge to the analytical approximate solutions.
 
 `Estimate_parameters` :
-- A notebook for messing around with parameter value estimates
+- A notebook for estimating parameters for ICB and SLC 
 
 
 `Stability`

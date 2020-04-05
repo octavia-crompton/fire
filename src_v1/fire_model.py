@@ -13,34 +13,7 @@ import scipy
 from fire_model import *
 from fire_analytic import *
 
-"""
-Parameters used throughout:
-    
-    r : float 
-        growth rate (1/yr)
-    k : float  
-        carrying capacity (kg/m2)
-    RI : float
-        fire return interval (yr)
-    severity : float
-        fire severity (fraction of biomass removed by fire)
-    r_lp : float
-        modified growth rate for the lower canopy  (1/yr)
-    k_lp :  float
-        modified carrying capacity for the lower canopy (kg/m2)
 
-   alpha : float
-        competition term, upper canopy inhibition of the lower canopy.
-
-    beta : float
-        soil moisture growth-limiting factor [-]
-
-    G_uo, G_lo : float
-        initial upper and lower canopy biomass (kg/m2)
-
-    ti : float
-        "Spin-up" time (years)
-"""
 class RCSR:
     """
     Contains the two layer fire model 
@@ -89,7 +62,7 @@ class RCSR:
         
         if self.severity_type == "random":
             self.severity_list = severity_sampler(n = self.n_fires, 
-                                           std_phi = self.std_phi,
+                                           std_severity = self.std_severity,
                                            severity = self.severity,
                                            a = self.a, b= self.b,
                                            r = self.r, seed = 0)          
@@ -223,7 +196,7 @@ class RCSR:
 
     def G_l_ignite_threshold(self):
         """
-        arbitrary numbers
+        
         """            
         
         RI_l= self.RI + self.chi*self.RI - \
@@ -233,29 +206,7 @@ class RCSR:
     
         return  p
 
-
-    def G_u_ignite_threshold(self):
-        """
-        """    
-        RI_p = self.RI - self.chi*self.RI/self.k_u*self.G_u 
-        
-        p = 1/RI_p
-        
-        if self.time_past_fire < 5:
-            p = 0
-        return  p  
-
-    def censor_ignite_threshold(self):
-        """
-        """    
-        RI_p = self.RI - self.chi*self.RI/self.k_u*self.G_u 
-        
-        p = 1/self.RI
-        
-        if self.time_past_fire < 5:
-            p = 0
-        return  p                
-
+       
 
     def random_ignition(self):
         """
@@ -420,7 +371,7 @@ class RCSR:
         if recomp == False:
             if self.severity_type == "random":
                 severity = predict_truncated_mean(
-                    self.severity, self.std_phi, self.a, self.b)      
+                    self.severity, self.std_severity, self.a, self.b)      
             else: 
                 severity = self.severity
         else:
@@ -478,7 +429,7 @@ class RCSR:
         if recomp == False:
             if self.severity_type == "random":
                 severity = predict_truncated_mean(
-                    self.severity, self.std_phi, self.a, self.b)      
+                    self.severity, self.std_severity, self.a, self.b)      
             else: 
                 severity = self.severity
         else:
@@ -723,23 +674,22 @@ def all_params(update = {}):
     params =  {
         "alpha" : 0.05,
         "beta" : 1,
+        "chi" : 1,
+        "dt" : 0.1,
+        "dt_p" : 0.1,            
+        "ignition_type" : "series",
         "k_u" : 20.,
-        "k_l" : 5.,
+        "k_l" : 5.,    
         "r_u" : 0.25,
         "r_l" : 1.5,          
-        "dt" : 0.1,
-        "dt_p" : 0.1,
-        "S" : 0.21,    
-        "chi" : 1,
-        "tmax" : 3000,
-        "ti" : 1000,
-        "minP" : 0.9,
-        "seed" : 0,
+        "S" : 0.5,
         "RI" : 60,           
-        "ignition_type" : "series",            
+        "seed" : 0,
+        "ti" : 1000,        
+        "tmax" : 3000,                    
         "severity_type" : "fixed",
         "severity" : 0.5,
-        "std_phi" : 0.1,
+        "std_severity" : 0.1,
         "r" : 0.5, 
         "a" : 0.01,
         "b" : 0.99
@@ -760,7 +710,7 @@ def print_param(param):
 ###########################################################################
 ####################### Code to sample severity ###########################
 ###########################################################################
-def severity_sampler(n = 1e5, severity = 0.3, std_phi = 0.01,
+def severity_sampler(n = 1e5, severity = 0.3, std_severity = 0.01,
                         r =0.5, seed = 0, include = False,
                         a = 0, b= 1):
     """
@@ -772,7 +722,7 @@ def severity_sampler(n = 1e5, severity = 0.3, std_phi = 0.01,
     n = int(n)
     np.random.seed(seed)
 
-    sigma_phi = std_phi**2
+    sigma_phi = std_severity**2
 
     K_0 = np.array([[1, r],
                    [r, 1]])*sigma_phi
@@ -810,26 +760,26 @@ def Phi_norm(d):
     """
     return 0.5*(1 + scipy.special.erf(d/np.sqrt(2.)))
 
-def predict_truncated_mean(severity, std_phi, a, b):
+def predict_truncated_mean(severity, std_severity, a, b):
     """
     Predict the mean of a truncated normal distribution 
     """
-    alpha_norm = (a-severity)/std_phi
-    beta_norm = (b-severity)/std_phi
+    alpha_norm = (a-severity)/std_severity
+    beta_norm = (b-severity)/std_severity
 
     numer = (phi_norm(alpha_norm) - phi_norm(beta_norm))
     denom = (Phi_norm(beta_norm) - Phi_norm(alpha_norm))      
     
-    return severity + std_phi*numer/denom
+    return severity + std_severity*numer/denom
 
 
-def predict_truncated_std(severity, std_phi, a, b):
+def predict_truncated_std(severity, std_severity, a, b):
     """
     Predict the standard deviation of a truncated normal
     distribution 
     """
-    alpha_norm = (a-severity)/std_phi
-    beta_norm = (b-severity)/std_phi
+    alpha_norm = (a-severity)/std_severity
+    beta_norm = (b-severity)/std_severity
     
     # Term 1
     numer = alpha_norm*phi_norm(alpha_norm)-\
@@ -842,7 +792,8 @@ def predict_truncated_std(severity, std_phi, a, b):
     denom = (Phi_norm(beta_norm) - Phi_norm(alpha_norm))   
     term2 = (numer/denom)**2
     
-    return std_phi*(1 + term1 - term2)**0.5
+    return std_severity*(1 + term1 - term2)**0.5
+
  ###########################################################################   
 def greater_than_zero(G_o):
     """
@@ -960,9 +911,9 @@ def compute_errors_mean(p):
     phi_std = p.record.u_severity.std()
 
     phi_tr_m = predict_truncated_mean(p.severity, 
-        p.std_phi, p.a, p.b)
+        p.std_severity, p.a, p.b)
     phi_tr_std = predict_truncated_std(p.severity, 
-        p.std_phi, p.a, p.b)    
+        p.std_severity, p.a, p.b)    
 
     df = pd.DataFrame({
         "analytic" : {

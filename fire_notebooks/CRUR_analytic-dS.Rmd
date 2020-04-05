@@ -12,10 +12,6 @@ jupyter:
     name: fire
 ---
 
-```{python}
-# %autosave 0
-```
-
 Explore sensitivity to varying soil moisture, growth-limiting factor, etc.
 
 ```{python}
