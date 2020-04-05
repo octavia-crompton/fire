@@ -1,0 +1,267 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.4.1
+  kernelspec:
+    display_name: fire
+    language: python
+    name: fire
+---
+
+```{python}
+# %autosave 0
+```
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+# %matplotlib inline
+import sys
+import time
+import itertools
+import multiprocessing as mp
+import copy
+import math
+from statsmodels.graphics.tsaplots import plot_acf
+
+sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
+
+mymodules = ['plot_config', "fire_model", "fire_plot", "fire_analytic" ]
+
+for mod in mymodules:
+    if mod in sys.modules:
+        del sys.modules[mod]
+
+
+from plot_config import *
+from fire_model import *
+from fire_analytic import *
+from fire_plot import *
+```
+
+```{python}
+# This code block is meant to show that we can predict the max severity and 
+# min frequency to sustain biomass in the upper canopy
+
+p = RCSR()
+update = {"soil_feedback" : "C",
+          "r_l" : 1.5,          
+          "alpha" : 0.05,
+          "beta" : 0,
+          "G_u" : p.k_u/10.,
+          "G_l" : p.k_l/10., 
+          "ti" : 2000, 
+          "tmax" : 1000,
+          "RI" : 60,
+          "severity" : 0.7,
+          "dt" : 0.01,
+          "dt_p" : 0.1,
+
+         }
+
+
+p = RCSR(update)
+p.run()
+
+print ("The minimum return interval with severity = {0} is {1:.2f} years".format(p.severity,p.min_RI_u()))
+print ("The maximum severity with RI = {0} years is {1:.4f}".format(p.RI, p.max_severity_u()))
+```
+
+```{python}
+p.record["error"] = (p.mean_G_u()- p.record.G_u_mean)/p.mean_G_u()*100
+p.record.tail()
+```
+
+```{python}
+canopy_plot(p, nfire = 10)
+```
+
+```{python}
+p = RCSR()
+update = {"soil_feedback" : "C",
+          "r_l" : 1.5,          
+          "alpha" : 0.05,
+          "beta" : 0,
+          "G_u" : p.k_u/10.,
+          "G_l" : p.k_l/10., 
+          "ti" : 1000, 
+          "tmax" : 1000,
+          "RI" : 20,
+          "severity" : 0.70,
+          "dt" : 0.01,
+          "dt_p" : 0.1,
+          "severity_type" : "random",
+          "ignition_type" : "random",          
+          "sigma_phi" : 0.01,
+          "seed" : 0
+         }
+
+
+p = RCSR(update)
+p.run()
+
+
+```
+
+```{python}
+fig, ax = plt.subplots(1, figsize = (14,4) )
+
+to = int(-100*p.RI/p.dt_p)
+ax.plot(p.t_p[to:], p.G_u_list[to:], '-', label ="upper canopy")        
+ax.plot(p.t_p[to:], p.G_l_list[to:], label = "lower canopy")       
+ax.set_ylabel("biomass")
+ax.legend()
+
+severity = update["severity"]
+
+G_u_min_a = p.G_u_postfire()
+G_u_max_a = G_u_min_a/(1-severity)
+if G_u_min_a>0:
+    plt.axhline(G_u_min_a, ls = "--", lw = 1)
+    plt.axhline(G_u_max_a, ls = "--", lw = 1)
+
+G_l_postfire = p.G_l_postfire()
+if G_l_postfire>0:
+    plt.axhline(p.G_l_postfire(),ls =  '--', c = 'k')
+
+
+```
+
+
+
+
+```
+res = pd.DataFrame()
+severities = np.arange(0.1, 1., 0.1)
+RIs = np.arange(5, 65, 5)
+
+r_ls =  [0.5, 1.0, 1.5]     
+alphas =  [0.02, 0.06, 0.1]  
+betas = [0, 0.5, 1]
+
+for j, severity in enumerate(severities):
+    for i, RI in enumerate(RIs):
+       
+        for k, r_l in enumerate(r_ls):
+            for l, alpha in enumerate(alphas):
+
+                update = {
+                          "alpha" : alpha,
+                          "r_l" : r_l,
+                          "r_u" : 0.25,
+                          "k_l" : 5,
+                          "k_u" : 20,
+                          "beta" : beta,
+                          "ti" : 100, 
+                          "RI" : RI,
+                          "tmax" : 2000,
+                          "severity" : severity,
+                          "dt" : 0.01,
+                          "dt_p" : 0.01,
+                          "severity_type" : "random",
+                          "ignition_type" : "random",          
+                          "sigma_phi" : 0.01,                    
+                         }            
+                      
+                p = RCSR(update)  
+                p.run()
+                            
+
+                df, dfl = compute_errors_mean(p)
+                update.update(np.abs(dfl))
+
+                res = res.append(update, ignore_index = True)
+res.to_pickle("./random_RI_phi.pkl")
+```
+
+```{python}
+res = pd.read_pickle("./random_RI_phi.pkl")
+```
+
+```{python}
+subset = res[(res.alpha==0.06)&(res.r_l == 1.5)]
+x_var = "RI"
+y_var = "severity"
+axes = plot_G_grid(subset, x_var, y_var)
+
+RIs = np.unique(subset.RI)
+p = RCSR(subset.iloc[0])
+severities = p.max_severity(p.r_u*p.S**p.beta, RIs)
+axes[0, 0].plot(RIs, severities, '--' )
+axes[1, 0].plot(RIs, severities, '--' )
+
+```
+
+## Where are the errors biggest?
+
+```{python}
+x = res["G_l_mean_e"]
+cols = ["r_l", "alpha", "severity", "RI", "G_l_mean_a", "G_l_mean_c", "G_l_mean_e", "G_u_mean_e" ]
+res[x == np.max(x)][cols]
+```
+
+## Check out the high error case
+
+```{python}
+p = RCSR()
+
+update = {
+          "alpha" : 0.06,
+          "r_l" : 0.5,
+          "beta" : 0,
+          "ti" : 0, 
+          "RI" : 10,
+          "tmax" : 5000,
+          "severity" : 0.9,
+          "dt" : 0.01,
+          "dt_p" : 0.01,
+          "severity_type" : "random",
+          "ignition_type" : "random",          
+          "std_phi" : 0.01,                    
+          "dt" : 0.01,
+          "dt_p" : 0.01       
+         }            
+
+
+p = RCSR(update)
+p.run()
+
+
+
+```
+
+```{python}
+canopy_plot(p, 200)
+```
+
+```{python}
+compute_errors_mean(p)[0]
+```
+
+```{python}
+check_convergence(p, to = 0, slice = 1000)
+
+```
+
+```{python}
+fig, axes = plt.subplots(1, 2, figsize = (14,4) )
+axes[0].hist(p.record.time_past_fire, 20, normed=True);
+y = np.arange(2, 100)
+lambda_RI = 1/p.RI
+axes[0].plot(y, lambda_RI*np.exp(-lambda_RI*y), label = "RI pdf")
+axes[0].set_title("Histograph of RIs")
+axes[0].set_xlabel("RI")
+
+axes[1].hist(p.record.u_severity, 20, normed=True);
+axes[1].set_title("Histograph of severities")
+axes[1].set_xlabel("severity")
+```
+
+```{python}
+
+```

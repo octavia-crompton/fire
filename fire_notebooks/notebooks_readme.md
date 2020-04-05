@@ -1,7 +1,7 @@
 
 ### List of notebooks
 
-
+<!-- #region -->
 `CRUR_analytic` :
 - Tests the analytical solution with constant RI and severity (no randomness)
 - currently over a grid of severities, RIs, alphas and r_ls.
@@ -28,6 +28,10 @@
 `Estimate_parameters` :
 - A notebook for messing around with parameter value estimates
 
+
+`Stability`
+- Still a hodgepodge, including code to parallelize
+<!-- #endregion -->
 
 ### List of pkl files:
 

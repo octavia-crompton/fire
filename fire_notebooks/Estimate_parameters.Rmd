@@ -1,0 +1,125 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.4.1
+  kernelspec:
+    display_name: fire
+    language: python
+    name: fire
+---
+
+
+
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+# %matplotlib inline
+import sys
+import time
+import itertools
+import multiprocessing as mp
+import copy
+import math
+
+```
+
+```{python}
+# Convert weighted mean carbon (Mg/ha) to biomass (kg/m2)
+print ("conifer = ", 97.13/10/0.47)
+print ("shrubs = ", 14.79/10/0.47)
+print ("meadow = ", 0.96/10/0.47)
+print ("grass = ",  0.36/10/0.47)
+
+# Alternative green canopy understory
+# k_l =  5.6/0.47/10 # kg/m2, powers, green canopy understory
+```
+
+```{python}
+import numpy as np
+## Estimate r from 
+b = 0.9
+a = 0.01
+
+def r_of_tau(tau, a,b):
+    return - np.log(a*(1-b)/(1-a))/tau
+
+tau_u = 60
+r_u = r_of_tau(tau_u, a,b)
+print ("conifer : tau={0}, r={1:.3f}".format(tau_u, r_u))
+
+
+tau_s = 6
+r_l = r_of_tau(tau_s, a,b)
+print ("shrubs : tau={0}, r={1:.3f}".format(tau_s, r_l))
+
+print(r_l/r_u)
+```
+
+```{python}
+import pandas as pd
+
+
+shrub_conifer = {"k_u" : 20.6, 
+                 "k_l" : 3.14,
+                 "r_u" : 0.15,
+                 "r_l" : 0.45,
+             }
+
+class params:
+    """    
+    """
+    def __init__(self, params = {}):
+        """
+        """
+        for k, v in params.items():
+             setattr(self, k, v)
+                
+p = params(shrub_conifer)
+
+A = -1
+alpha = (1-A)*p.r_l/p.k_u
+alpha
+```
+
+$$ r_l S^\beta \big(1-\frac{G_l}{k_l}\big) = \alpha G_u$$
+
+
+$$  \big(1- \frac{ \alpha G_u}{r_l S^\beta}\big){k_l} =  {G_l} $$
+
+
+## Understanding poisson
+
+```{python}
+lambDa = 0.05
+dt = 1
+count = 0
+events = []
+time_since = 0
+waits = []
+for i in range(100000):
+    if np.random.rand() < lambDa:
+        count +=1
+        waits.append(time_since + 1)
+        time_since = 0
+        events.append(1)
+        
+    else:
+        time_since += 1        
+        events.append(0)
+```
+
+```{python}
+wait_times = np.diff(np.nonzero(np.random.poisson(lambDa, 100000)))[0] 
+```
+
+```{python}
+plt.hist(waits, 200, alpha=0.5);
+# plt.hist(wait_times, 200);
+plt.axvline(5, c= "k")
+```

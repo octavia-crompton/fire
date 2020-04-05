@@ -730,14 +730,13 @@ def all_params(update = {}):
         "dt" : 0.1,
         "dt_p" : 0.1,
         "S" : 0.21,    
-        "n" : 0.4,
         "chi" : 1,
         "tmax" : 3000,
         "ti" : 1000,
         "minP" : 0.9,
         "seed" : 0,
-        "ignition_type" : "series",
-        "RI" : 60,        
+        "RI" : 60,           
+        "ignition_type" : "series",            
         "severity_type" : "fixed",
         "severity" : 0.5,
         "std_phi" : 0.1,
@@ -860,7 +859,7 @@ def greater_than_zero(G_o):
 
 def less_than_one(x):
     """
-    set all values smaller than zero to zero
+    Set all values smaller than zero to zero
     
     compatible with floats, arrays and lists...  
 
@@ -876,12 +875,11 @@ def rmse(x,y):
     return np.sqrt(np.mean((x-y)**2))
 
 
-
 def compute_errors(p):
     """
     Compares analytic predictions and simulations results 
     """
-    to =np.where(p.t_p >= p.record.iloc[0]["year"])[0][0]
+    to = np.where(p.t_p >= p.record.iloc[0]["year"])[0][0]
 
     G_u_list = p.G_u_list[to:to+(int)(p.RI/p.dt_p)]
     gamma = 0.8
