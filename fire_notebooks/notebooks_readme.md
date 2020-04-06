@@ -18,7 +18,7 @@
 `CRUR_analytic-G_L_ignition` :
 - Explore potential feedbacks between G_l and ignition probability.
 
-`CRUR_illustrate`:
+`RCSR_illustrate`:
 -  Illustrative notebook showing a single parameter case.
 
 `CRUR_truncated_gaussian` :

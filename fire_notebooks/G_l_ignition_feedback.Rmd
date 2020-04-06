@@ -17,67 +17,43 @@ jupyter:
 ```
 
 ```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-# %matplotlib inline
-import sys
-import time
-import itertools
-import multiprocessing as mp
-import copy
-import math
-from statsmodels.graphics.tsaplots import plot_acf
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import pandas as pd
+# # %matplotlib inline
+# import sys
+# import time
+# import itertools
+# import multiprocessing as mp
+# import copy
+# import math
+# from statsmodels.graphics.tsaplots import plot_acf
 
-sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
+# sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
 
-mymodules = ['plot_config', "fire_model", "fire_plot", "fire_analytic" ]
+# mymodules = ['plot_config', "fire_model", "fire_plot", "fire_analytic" ]
 
-for mod in mymodules:
-    if mod in sys.modules:
-        del sys.modules[mod]
+# for mod in mymodules:
+#     if mod in sys.modules:
+#         del sys.modules[mod]
 
-from plot_config import *
-from fire_model import *
-from fire_analytic import *
-from fire_plot import *
-```
-
-## Quick simulation to reassure that everything is working
-
-```{python}
-# This code block is meant to show that we can predict the max severity and 
-# min frequency to sustain biomass in the upper canopy
-
-p = RCSR()
-update = {
-          "r_l" : 1.5,          
-          "alpha" : 0.05,
-          "beta" : 0,
-          "G_u" : p.k_u/10.,
-          "G_l" : p.k_l/10., 
-          "ti" : 2000, 
-          "tmax" : 1000,
-          "RI" : 60,
-          "severity" : 0.7,
-          "dt" : 0.01,
-          "dt_p" : 0.1,
-
-         }
-
-
-p = RCSR(update)
-p.run()
-
-p.record["error"] = (p.mean_G_u()- p.record.G_u_mean)/p.mean_G_u()*100
-p.record.tail()
-
-print ("The minimum return interval with severity = {0} is {1:.2f} years".format(p.severity,p.min_RI_u()))
-print ("The maximum severity with RI = {0} years is {1:.4f}".format(p.RI, p.max_severity_u()))
+# from plot_config import *
+# from fire_model import *
+# from fire_analytic import *
+# from fire_plot import *
 ```
 
 ```{python}
-canopy_plot(p)
+import os
+startup_file = "/Users/octavia/Dropbox/fire/src_v1/startup.py"
+```
+
+```{python}
+run "/Users/octavia/Dropbox/fire/src_v1/startup.py"
+```
+
+```{python}
+
 ```
 
 ## The $G_l$-fire feedback
