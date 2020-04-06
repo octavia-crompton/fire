@@ -87,7 +87,8 @@ class RCSR:
         return extract_params
 
     def __repr__(self):
-        attrs = vars(self)
+        # attrs = vars(self)
+        attrs = self.get_params()
         d = '{' + ',\n  '.join("%s: %s" % item for 
             item in attrs.items()) +'}'
         return d

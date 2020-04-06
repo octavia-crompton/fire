@@ -37,5 +37,3 @@ Stability : Things are slow to converge near the stability boundary
 
 -  `G_postfire(self)` does not need RI or severity.
  Is this function defined in `fire_analytic.py`?
-
-- want a nifty little function to compare two dictionaries.

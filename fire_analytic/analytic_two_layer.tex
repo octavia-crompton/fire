@@ -203,15 +203,15 @@ Substitute Equation  \ref{G_uo} and simplify:
 	For lower growth rates, a longer return interval is needed to sustain biomass.  Increasing $\beta$ and/or decreasing $S$  lowers the effective upper canopy growth rate
 	
 
-% Figure
+% Notebook: stability
 \begin{figure}[h]
  \centering
-\includegraphics[width=33pc]{../fire_plots/stability_min_RI.png}
- \caption{ (a) }
+  \includegraphics[width=33pc]{../fire_plots/stability_min_RI.png}
+ \caption{ As $\beta$ increases / $S$ decreases, the effective growth rate $r'_u$ decreases, and so the minimum RI to sustain biomass increases }
  \label{fig:stability_min_RI.png}
  \end{figure}
  
-         
+        
 If $\beta>0$, a longer return time is needed for lower soil moisture conditions:
 
 
@@ -254,10 +254,10 @@ S > \bigg( - \frac{1}{r_u \xi }\log (1 - \phi_S)\bigg)^{1/\beta}
         \end{equation}
         
         
-        
+%%% Notebook: stability
  \begin{figure}[h]
  \centering
-\includegraphics[width=25pc]{../fire_plots/stability.png}
+\includegraphics[width=20pc]{../fire_plots/stability.png}
  \caption{ The relationship between $\hat G_u$ and $k_u$ constrains that between $RI$ and severity, and vice versa.}
  \label{fig:stability}
  \end{figure}
@@ -283,6 +283,10 @@ With some math:
  	\xi > - \frac{\log(1-\phi_S)}{r_u S^\beta} \frac{\alpha k_u - r_u S^\beta}{\alpha k_u - r_l S^\beta}
 \end{equation}
 
+In cases where ${\alpha k_u - r_l S^\beta} < 0$, there is no maximum $\xi$ to sustain $G_l$.
+
+
+% see 'max_RI_l in fire_analytic.py
 
   \subsection{$\hat G_l$ along a `stability' curve?}
 

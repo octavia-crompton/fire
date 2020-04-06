@@ -162,15 +162,7 @@ p.run()
 ```
 
 ```{python}
-p.record.tail()
-```
-
-```{python}
 canopy_plot(p, nfire=10)
-```
-
-```{python}
-p.record.tail()
 ```
 
 ```{python}
@@ -198,7 +190,7 @@ for S in Ss:
     ax.fill_between(betas, min_RI, np.max(min_RI), alpha = 0.1)
 
 ax.set_xlabel(r"$\beta$")
-ax.set_title("Minimum $RI$ for $G_u$")
+ax.set_title("Minimum $RI$ to sustain $G_u$")
 ax.set_ylabel(r"$RI$")
 
 ax.legend(title = "$S$")
@@ -207,61 +199,92 @@ ax.legend(title = "$S$")
 ax = axes[1]
 
 S = np.arange(0.2, 1,0.01)
-
 betas = [0.25, 0.5, 0.75]
+
 for beta in betas:
     r_up = p.r_u*S**beta
     min_RI = -1./r_up*np.log(1-p.severity)
-    plt.plot(S, min_RI, label = beta)
+    ax.plot(S, min_RI, label = beta)
 
     plt.fill_between(S, min_RI, np.max(min_RI), alpha = 0.1)
 
+ax.set_xlabel(r"$S$")
+ax.set_ylabel("$RI$")
+ax.set_title("Minimum $RI$ to sustain $G_u$")
+ax.legend(title = r"$\beta$")    
     
 fig.savefig(figdir + '/stability_min_RI.png', format='png', dpi=1000, bbox_inches = "tight")
 
-# # # 
-# # # As betas increases, r'_u decreases, so the minimum RI to sustain biomass increases
-```
 
-```{python}
-
-```
-
-```{python}
-
-# beta = 0.75
-# r_up = r_u*S**beta
-# min_RI = -1./r_up*np.log(1-p.severity)
-# plt.plot(S, min_RI, label = r"$\beta$ = 0.75")
-
-# plt.fill_between(S, min_RI, np.max(min_RI), alpha = 0.1)
-
-# plt.xlabel(r"$S$")
-# plt.ylabel("$RI$")
-# plt.title("Minimum $RI$ for $G_u$")
-# plt.legend()
 ```
 
 ## Lower canopy stability is sensitive to $\beta$
 
 ```{python}
-set_defaults()
-beta = np.arange(0.3,1,0.01)
-r = r_u*S**beta
+def print_dict(d):
+    # attrs = vars(self)
+    d =  ',  '.join("$%s$ = %s" % item for 
+        item in d.items()) 
+    return d
+```
 
-max_RI = max_RI_l(r_l, r_u, k_u, S, beta, alpha, RI, severity)
-max_RI[(alpha *k_u - r_l*S**beta) < 0.0] = np.nan
+```{python}
+def G_l_stability_v_beta(p, update,  betas, ax):
+    """
+    Plot the stability of the lower canopy as a function of beta
+    """
+    max_RI = max_RI_l(p.r_l, p.r_u, p.k_u, p.S, betas, p.alpha, p.RI, p.severity)
+    max_RI[(p.alpha *p.k_u - p.r_l*p.S**betas) < 0.0] = np.nan
+    max_RI[max_RI > 100] = np.nan
+    min_RI = min_RI_l(p.r_l, p.S, betas, p.severity)
 
-min_RI = min_RI_l(r_l, S, beta, severity)
+    ax.plot(betas, max_RI, label = "max RI ")
+    ax.plot(betas, min_RI, label = "min RI ")
+    ax.fill_between(betas, min_RI, max_RI, alpha = 0.1)
 
-plt.plot(beta, max_RI, label = "max RI ")
-plt.plot(beta, min_RI, label = "min RI ")
-plt.fill_between(beta, min_RI, max_RI, alpha = 0.1)
+    ax.legend()
+    ax.set_title("Lower canopy stability; " + print_dict(update))
+    ax.set_xlabel(r"$\beta$")
+    ax.set_ylabel(r"$RI$")
 
-plt.legend()
-plt.xlabel(r"$\beta$")
-plt.ylabel(r"$RI$")
-plt.title("Lower canopy stability")
+    
+    return ax
+```
+
+```{python}
+fig, axes = plt.subplots(1,2, figsize = (14, 4))
+
+
+params = all_params()
+
+ax = axes[0]
+update = {"S" : 0.5}
+params.update(update)
+p = RCSR(params)
+
+ax = G_l_stability_v_beta(p, update, betas, ax)
+
+ax = axes[1]
+update = {"S" : 0.2}
+params.update(update)
+p = RCSR(params)
+
+ax = G_l_stability_v_beta(p, update, betas, ax)
+
+```
+
+```{python}
+print_dict(update)
+```
+
+## Test out intuition here
+
+```{python}
+update = {"S" : 0.5, "beta"  : 1, "RI" : 20}
+params.update(update)
+p = RCSR(update)
+
+p.run()
 ```
 
 ## Lower canopy stability is sensitive to $\alpha$

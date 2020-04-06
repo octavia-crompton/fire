@@ -85,7 +85,6 @@ def min_RI_u(r_u,S, beta, severity):
 def max_RI_l(r_l, r_u, k_u, S, beta, alpha, RI, severity):
 	"""
 	Bounds the maximum return time for which G_l >0
-
 	"""
 	a = - np.log(1-severity)/(r_u*S**beta)
 	numer = (alpha*k_u - r_u*S**beta)
@@ -93,6 +92,9 @@ def max_RI_l(r_l, r_u, k_u, S, beta, alpha, RI, severity):
 	return a*numer/denom
 
 def min_RI_l(r_l, S, beta, severity):
+    """
+    Bounds the minimum return time for which G_l >0
+    """
     r = r_l*S**beta
     return -1./r*np.log(1-severity)
 
@@ -103,7 +105,6 @@ def max_severity_u( r_u, RI):
     find the maximum severity for which G > 0.
     """
     return 1 - np.exp(-r_u*RI)
-
 
 """
 Estimates related to G_l in equilibrium with G_max

@@ -25,23 +25,27 @@ Explore sensitivity to varying soil moisture, growth-limiting factor, etc.
 # import multiprocessing as mp
 # import copy
 # import math
-import sys
+# import sys
 
-sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
+# sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
 
-mymodules = ['plot_config', "fire_model", "fire_utility",
-             "fire_plot", "fire_analytic" ]
+# mymodules = ['plot_config', "fire_model", "fire_utility",
+#              "fire_plot", "fire_analytic" ]
 
-for mod in mymodules:
-    if mod in sys.modules:
-        del sys.modules[mod]
+# for mod in mymodules:
+#     if mod in sys.modules:
+#         del sys.modules[mod]
 
 
-from plot_config import *
-from fire_model import *
-from fire_analytic import *
-from fire_utility import *
-from fire_plot import *
+# from plot_config import *
+# from fire_model import *
+# from fire_analytic import *
+# from fire_utility import *
+# from fire_plot import *
+```
+
+```{python}
+run '/Users/octavia/Dropbox/fire/src_v1/startup.py'
 ```
 
 ```{python}
@@ -76,20 +80,6 @@ p = param_class(params)
 ```
 
 ## Check how parameters differ from the fire model defaults
-
-```{python}
-
-def difference(a, b):
-    if type(a) in  [int, float]:
-        return round(a-b, 8)
-    else:
-        return '/'.join([a,b])
-
-def difference_from_default(params)
-    value = { k : difference(params[k], all_params()[k])  for k in set(params) 
-        if params[k] != all_params()[k]}
-    
-```
 
 ```{python}
 # p = RCSR()
