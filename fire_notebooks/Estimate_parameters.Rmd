@@ -111,6 +111,22 @@ p = params(shrub_conifer)
 
 ```
 
+
+## Stability of the lower canopy
+Maximum $\alpha$ where lower canopy biomass is stable (without fires)
+
+
+```{python}
+
+S = 0.5
+beta = 0.5
+k_u = 20
+r_l = 0.45
+max_alpha = r_l*S**beta/k_u
+
+print (max_alpha)
+```
+
 ## Understanding poisson
 
 ```{python}

@@ -84,8 +84,9 @@ def difference(a, b):
         return round(a-b, 8)
     else:
         return '/'.join([a,b])
- 
-value = { k : difference(params[k], all_params()[k])  for k in set(params) 
+
+def difference_from_default(params)
+    value = { k : difference(params[k], all_params()[k])  for k in set(params) 
         if params[k] != all_params()[k]}
     
 ```
@@ -115,13 +116,14 @@ for beta in np.arange(0.1, 1.1, 0.3):
     beta = np.round(beta, 1)
     
     ax = axes[0]    
-    G_u_mean = mean_G_u(p.r_u ,  p.k_u , S, beta , p.RI , p.severity)
+    G_u_mean = mean_G_u(p.r_u ,  p.k_u , S, 
+                        beta , p.RI , p.severity)
     ax.plot(S, G_u_mean, label = beta)
     
     ax = axes[1]
     
     G_l_mean = mean_G_l(p.r_l, p.r_u, p.k_l, p.k_u, S, 
-                        beta, p.alpha , RI , severity )
+                        beta, p.alpha , p.RI , p.severity )
     G_l_mean[G_l_mean == 0] = np.nan
     ax.plot(S,G_l_mean, label = beta)
 

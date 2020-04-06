@@ -8,8 +8,6 @@ import copy
 import math
 from statsmodels.graphics.tsaplots import plot_acf
 import scipy
-
-from fire_model import *
 from fire_analytic import *
 
 
@@ -78,7 +76,16 @@ class RCSR:
                         "u_severity", "l_severity",
                         "G_u_mean_a", "G_l_mean_a"
                         ])
-   
+  
+    def get_params(self):
+        """
+        Extract parameter dictionary from class object
+        """
+        extract_params = {}
+        for k in list(all_params().keys()):
+            extract_params[k] =  vars(self)[k]
+        return extract_params
+
     def __repr__(self):
         attrs = vars(self)
         d = '{' + ',\n  '.join("%s: %s" % item for 
@@ -388,9 +395,22 @@ class RCSR:
 
     def mean_G_l(self, recomp = False):
         """
-        Estimates the mean lower canopy biomass by
-        (a)  approximating G_u as constant (G_u_mean) 
-        (b)  rewriting the G_l equation in logistic form (r_lp, k_lp)
+        Estimates the mean lower canopy biomass 
+    
+        Parameters:
+        ----------
+        recomp: bool
+            If true, recompute the mean RI from the fire record
+
+        Returns:
+        --------
+        G_l_mean: float 
+            The predicted mean G_l
+        
+        Notes:
+        ------
+        (a) approximating G_u as constant (G_u_mean) 
+        (b) rewriting the G_l equation in logistic form (r_lp, k_lp)
         (c) using the same approach as used to solve for G_u_mean
         
         The approximation is given as
@@ -421,8 +441,13 @@ class RCSR:
 
     def fix_G_l(self, gamma):
         """
-        For lack of a better name, solves for mean(G_l) if we assume 
-        mean(G_u) = gamma(k_u)
+        Solves for mean(G_l) given the assumption:
+            mean(G_u) = gamma*k_u
+
+        Parameters:
+        ----------
+        gamma: float
+            defined as mean(G_u) = gamma*k_u
         """
         numer = self.alpha*self.k_u*gamma + \
                      (1-gamma)*self.r_u*self.S**self.beta
@@ -431,9 +456,16 @@ class RCSR:
         return  1 - numer/denom
                
     def G_postfire(self, r, k, RI, severity):
-        """
+        """        
         Computes the biomass immediately after each fire,
-        once the system is in dynamic equilibrium
+        assuming the system is in dynamic equilibrium
+
+        Parameters:
+        -----------
+        r : float
+            generalized growth rate
+        k : float
+            generalized growth rate            
         """
         x = r*RI
         phi_R = 1 - severity # fraction of biomass remaining
@@ -659,7 +691,7 @@ def all_params(update = {}):
         "r_u" : 0.25,
         "r_l" : 1.5,                    
         "S" : 0.5,
-        "dt" : 0.1,
+        "dt" : 0.01,
         "dt_p" : 0.1,            
         "seed" : 0,
         "ti" : 1000,        
@@ -934,4 +966,24 @@ def compute_errors_mean(p):
     return df, dfl    
 
 ####################################################################
+######################## UTILITIES #################################
 ####################################################################
+
+def difference(a, b):
+    """
+    Returns a-b for floats and ints,
+    returns "a/b" for strings
+    """
+    if type(a) is not str:
+        #return round(a-b, 8)
+        return '{0:.2f}; default={1:.2f}'.format(a,b)
+    else:
+        return '; default='.join([a,b])
+
+def diff_from_default(params):
+    """
+    Compares a parameter dictionary 
+    """
+    value = { k : difference(params[k], all_params()[k])  for k in set(params) 
+        if params[k] != all_params()[k]}
+    return value

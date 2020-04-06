@@ -29,3 +29,13 @@ biomass growth on smaller timesteps.
    -  the fraction of biomass removed from the fire.
    - Upper and lower fire severities are drawn from bivariate normal distribution
    - how do things depend on the degree of correlation between layers?
+
+
+## Issues:
+Stability : Things are slow to converge near the stability boundary
+ -  things are converging with an error
+
+-  `G_postfire(self)` does not need RI or severity.
+ Is this function defined in `fire_analytic.py`?
+
+- want a nifty little function to compare two dictionaries.

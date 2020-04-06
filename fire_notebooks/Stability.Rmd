@@ -17,50 +17,34 @@ jupyter:
 ```
 
 ```{python}
-import sys
 
-sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
-
-mymodules = ['plot_config', "fire_model", "fire_utility",
-             "fire_plot", "fire_analytic" ]
-
-for mod in mymodules:
-    if mod in sys.modules:
-        del sys.modules[mod]
-
-
-from plot_config import *
-from fire_model import *
-from fire_analytic import *
-from fire_utility import *
-from fire_plot import *
-```
-
-```{python}
-# # %matplotlib inline
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import pandas as pd
 # import sys
-# import time
-# import itertools
-# import multiprocessing as mp
-# import copy
-# import math
-# import scipy
 
 # sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
 
-# mymodules = ['plot_config', "fire_model", "fire_plot", "fire_analytic" ]
+# mymodules = ['plot_config', "fire_model", "fire_utility", "filepaths",
+#              "fire_plot", "fire_analytic" ]
 
 # for mod in mymodules:
 #     if mod in sys.modules:
 #         del sys.modules[mod]
 
+
 # from plot_config import *
 # from fire_model import *
 # from fire_analytic import *
+# from fire_utility import *
 # from fire_plot import *
+# from filepaths import *
+```
+
+```{python}
+import os
+startup_file = "/Users/octavia/Dropbox/fire/src_v1/startup.py"
+```
+
+```{python}
+run "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 ```
 
 ###  Maximum severity / minimm return interval to sustain upper canopy biomass
@@ -89,130 +73,39 @@ params =  {
     "a" : 0.01,
     "b" : 0.99
 } 
-p = param_class(params)
+p = RCSR(params)
 ```
 
 ```{python}
-# p = RCSR()
-# update = {"r_u" :0.15,
-#           "r_l" : 0.45,
-#           "k_u" : 20,
-#           "k_l" : 5,
-#           "S" : 0.5,
-#           "beta" : 1,
-#           "alpha" : 0.01,          
-#           "soil_feedback" : "C",          
-#           "ti" : 0, 
-#           "tmax" : 100,
-#           "RI" : 100,
-#           "severity" : 0.5,
-#           "dt" : 0.01,
-#           "dt_p" : 0.1
-#          }
-# p = RCSR(update)
 
-# p.run()
-
+fig, ax = plt.subplots(1, figsize = (7,4) )
 
 RIs = np.arange(0, 100, .1)
-severities = p.max_severity(p.r_u*p.S**p.beta, RIs)
-plt.plot(  RIs,severities )
-plt.fill_between(RIs,severities, alpha = 0.1)
+severities = max_severity_u(p.r_u*p.S**p.beta, RIs)
+ax.plot(  RIs,severities )
+ax.fill_between(RIs,severities, alpha = 0.1)
 
 for gamma in [0.1, 0.5, 0.75, 0.9]:
-    severities = p.max_severity((1-gamma)*p.r_u*p.S**p.beta, RIs)
-    plt.plot(RIs, severities , '--', label = gamma)
+    severities = max_severity_u((1-gamma)*p.r_u*p.S**p.beta, RIs)
+    ax.plot(RIs, severities , '--', label = gamma)
 
 
-plt.legend(title = "$\gamma$")
-plt.ylabel("maximum severity")
-plt.xlabel("Return interval (years)")
-plt.title("Stability curve ($\hat G_u = \gamma k_u$)")
-# Take aways: 
-# once you get to a 20 year return, you can have very high severity fires.
-# stability boundary does not depend on the carrying capacity - only the growth rate.
-# (i.e. slower growing forests can't burn as often.)
+ax.legend(title = "$\gamma$")
+ax.set_ylabel("maximum severity")
+ax.set_xlabel("Return interval (years)")
+ax.set_title("Stability curve ($\hat G_u = \gamma k_u$)")
+fig.savefig(figdir + '/stability.png', format='png', dpi=1000, bbox_inches = "tight")
+
 ```
 
-## Schematic comparison of IC and SL
+## Double check the stability curve
 
 ```{python}
-r_u = 0.15
-r_l = 0.45
-k_u = 20
-k_l = 5
-beta = 0.5 
-
-severity = 0.5
-S = 0.5
-RIs = np.arange(0, 100, .1)
-G_us = mean_G_u(r_u, k_u, S, beta, RIs, severity)
-line = plt.plot(  RIs,G_us, label = "IC")
-
-RI_i = 80; 
-RI_f = 20;
-G_u_i = (mean_G_u(r_u, k_u, S, beta, RI_i, severity))
-plt.plot(RI_i, G_u_i, "o",  c= line[0].get_color(), ms = 10)
-plt.plot(RI_f, G_u_i*0.75, "o", c= line[0].get_color(), ms = 10)
-
-
-S = 0.25
-RIs = np.arange(0, 100, .1)
-G_us = mean_G_u(r_u, k_u, S, beta, RIs, severity)
-line = plt.plot(  RIs,G_us, label = "SL")
-
-RI_i = 80; 
-RI_f = 40;
-G_u_i = (mean_G_u(r_u, k_u, S, beta, RI_i, severity))
-plt.plot(RI_i, G_u_i, "o",  c= line[0].get_color(), ms = 10)
-plt.plot(RI_f, G_u_i*0.95, "o", c= line[0].get_color(), ms = 10)
-
-
-plt.legend(loc = "lower right")
-plt.xlabel("RI")
-plt.ylabel("$G_u$")
-```
-
-## Stability of the lower canopy
-
-```{python}
-S = 0.5
-beta = 0.5
-k_u = 20
-r_l = 0.45
-max_alpha = r_l*S**beta/k_u
-
-print (max_alpha)
-```
-
-## $G_l$ along the 'stability curve'
-
-```{python}
-
-p = RCSR()
-
-up = {"r_u" :0.25,
-          "r_l" : 1.5,
-          "k_u" : 20,
-          "k_l" : 5,
-          "S" : 0.21,
-          "beta" : 0.1,
-          "alpha" : 0.03,
-          "soil_feedback" : "C",                  
-          "G_u" : p.k_u/10.,
-          "G_l" : p.k_l/10., 
-          "ti" : 1000, 
-          "tmax" : 1000,
-          "RI" : 10,
-          "dt" : 0.01,
-          "dt_p" : 0.1,
-
-         }
 gamma = 0.5
-up["severity"] = 1 - np.exp(-(1-gamma)*up["r_u"]*up["S"]**up["beta"]*up["RI"])
-
-p = RCSR(up)
-
+p = RCSR(params)
+severity = max_severity_u((1-gamma)*p.r_u*p.S**p.beta, p.RI)
+params["severity"] = severity
+p = RCSR(params)
 p.run()
 
 ```
@@ -227,8 +120,6 @@ ax.plot(p.t_p[to:], p.G_l_list[to:], label = "lower canopy")
 ax.set_ylabel("Biomass")
 ax.legend()
 
-severity = update["severity"]
-
 G_u_min_a = p.G_u_postfire()
 G_u_max_a = G_u_min_a/(1-p.severity)
 if G_u_min_a>0:
@@ -242,120 +133,113 @@ if G_l_postfire>0:
 
 ```
 
+
 ## Things are slow to converge near the stability boundary
 
 ```{python}
-
+run '/Users/octavia/Dropbox/fire/src_v1/startup.py'
 ```
 
 ```{python}
-
-p = RCSR()
-update = {"soil_feedback" : "C",
-          "alpha" : 0.02,
-          "beta" : 1,
-          "G_u" : p.k_u/10.,
-          "G_l" : p.k_l/10., 
-          "ti" : 1000, 
-          "tmax" : 3000,
-          "RI" : 29,
-          "severity" : 0.7818,
-          "dt" : 0.01,
-          "dt_p" : 0.1,
+update = {"alpha" : 0.02,                
+          "RI" : 20,
+          "ti" : 1000,
+          "tmax" : 10000,
+          "dt_p" : .01
          }
-
-
+params.update(update)
 p = RCSR(update)
+print_limits(p)
+```
+
+_Move closer to the severity threshold and reinitialize_
+
+```{python}
+update["severity"] = p.max_severity_u() - 0.02
+p = RCSR(update)
+diff = diff_from_default(update)
 p.run()
-
-print ("The minimum return interval with severity = {0} is {1:.2f} years".format(p.severity,p.min_RI_u()))
-print ("The maximum severity with RI = {0} years is {1:.4f}".format(p.RI, p.max_severity_u()))
 ```
 
 ```{python}
-
-p.record["error"] = (p.mean_G_u()- p.record.G_u_mean)/p.mean_G_u()*100
 p.record.tail()
-plt.plot(p.record.year, p.record["error"])
-plt.ylabel("error")
-plt.xlabel("year")
 ```
 
 ```{python}
-fig, ax = plt.subplots(1, figsize = (14,4) )
+canopy_plot(p, nfire=10)
+```
 
-to = - int(5*p.RI/p.dt_p)
-ax.plot(p.t_p[to:], p.G_u_list[to:], '-', label ="upper canopy")        
-ax.plot(p.t_p[to:], p.G_l_list[to:], label = "lower canopy")       
-ax.set_ylabel("biomass")
-ax.legend()
+```{python}
+p.record.tail()
+```
 
+```{python}
+fig, ax = plt.subplots(1, figsize = (5,4))
+p.record["G_u_error"] = (p.mean_G_u()- p.record.G_u_mean)/p.mean_G_u()*100
 
-G_u_min_a = p.G_u_postfire()
-G_u_max_a = G_u_min_a/(1-p.severity)
-if G_u_min_a>0:
-    plt.axhline(G_u_min_a, ls = "--", lw = 1)
-    plt.axhline(G_u_max_a, ls = "--", lw = 1)
-
+ax.plot(p.record.year[10:], p.record.G_u_error[10:])
+ax.set_ylabel("$G_u$ percent error")
+ax.set_xlabel("year")
+# # ???????????
 ```
 
 ## Upper canopy stability is sensitive to $\beta$
 
 ```{python}
-def set_defaults():
-    r_l = 1.5
-    r_u = 0.25
-    k_u = 20
-    k_l = 5
-    RI = 20
-    S = .21
-    alpha = 0.06
-    beta = 0.5
-    severity = 0.5
-    globals().update(locals())
+fig, axes = plt.subplots(1,2, figsize = (14, 4))
+betas = np.arange(0,1,0.01)
+Ss = [0.2, 0.5, 0.7]
+ax = axes[0]
+for S in Ss:
+    r_up = p.r_u*S**betas
+    min_RI = -1./r_up*np.log(1-p.severity)
+
+    ax.plot(betas, min_RI, label = S)
+    ax.fill_between(betas, min_RI, np.max(min_RI), alpha = 0.1)
+
+ax.set_xlabel(r"$\beta$")
+ax.set_title("Minimum $RI$ for $G_u$")
+ax.set_ylabel(r"$RI$")
+
+ax.legend(title = "$S$")
+
+
+ax = axes[1]
+
+S = np.arange(0.2, 1,0.01)
+
+betas = [0.25, 0.5, 0.75]
+for beta in betas:
+    r_up = p.r_u*S**beta
+    min_RI = -1./r_up*np.log(1-p.severity)
+    plt.plot(S, min_RI, label = beta)
+
+    plt.fill_between(S, min_RI, np.max(min_RI), alpha = 0.1)
+
+    
+fig.savefig(figdir + '/stability_min_RI.png', format='png', dpi=1000, bbox_inches = "tight")
+
+# # # 
+# # # As betas increases, r'_u decreases, so the minimum RI to sustain biomass increases
 ```
 
 ```{python}
-set_defaults()
 
-beta = np.arange(0,1,0.01)
-r_up = r_u*S**beta
-min_RI = -1./r_up*np.log(1-severity)
-
-plt.plot(beta, min_RI)
-plt.fill_between(beta, min_RI, np.max(min_RI), alpha = 0.1)
-
-plt.xlabel(r"$\beta$")
-plt.ylabel("$RI$")
-plt.title("Minimum $RI$ for $G_u$")
-
-# Increasing beta is like decreasing the growth rate, for fixed soil moisture.
-# As beta increases, r'_u decreases, so the minimum RI to sustain biomass increases
 ```
 
 ```{python}
-set_defaults()
 
-S = np.arange(0.01, 0.3,0.01)
+# beta = 0.75
+# r_up = r_u*S**beta
+# min_RI = -1./r_up*np.log(1-p.severity)
+# plt.plot(S, min_RI, label = r"$\beta$ = 0.75")
 
-beta = 0.5
-r_up = r_u*S**beta
-min_RI = -1./r_up*np.log(1-severity)
-plt.plot(S, min_RI, label = r"$\beta$ = 0.5")
+# plt.fill_between(S, min_RI, np.max(min_RI), alpha = 0.1)
 
-plt.fill_between(S, min_RI, np.max(min_RI), alpha = 0.1)
-
-beta = 0.75
-r_up = r_u*S**beta
-min_RI = -1./r_up*np.log(1-severity)
-plt.plot(S, min_RI, label = r"$\beta$ = 0.75")
-
-plt.fill_between(S, min_RI, np.max(min_RI), alpha = 0.1)
-
-plt.xlabel(r"$S$")
-plt.ylabel("$RI$")
-plt.title("Minimum $RI$ for $G_u$")
-plt.legend()
+# plt.xlabel(r"$S$")
+# plt.ylabel("$RI$")
+# plt.title("Minimum $RI$ for $G_u$")
+# plt.legend()
 ```
 
 ## Lower canopy stability is sensitive to $\beta$
@@ -783,5 +667,34 @@ a.reshape(4, 4)
 ```
 
 ```{python}
+## Schematic comparison of ICB and SLC
 
+RIs = np.arange(0, 100, .1)
+G_us = mean_G_u(p.r_u, p.k_u, p.S, p.beta, RIs, p.severity)
+line = plt.plot(  RIs,G_us, label = "IC")
+
+RI_i = 80; 
+RI_f = 20;
+G_u_i = (mean_G_u(p.r_u, p.k_u, p.S, p.beta, RI_i, p.severity))
+plt.plot(RI_i, G_u_i, "o",  c= line[0].get_color(), ms = 10)
+plt.plot(RI_f, G_u_i*0.75, "o", c= line[0].get_color(), ms = 10)
+
+
+##. Update SLC soil moisture
+p.S = 0.25
+
+RIs = np.arange(0, 100, .1)
+G_us = mean_G_u(p.r_u, p.k_u, p.S, p.beta, RIs, p.severity)
+line = plt.plot(  RIs,G_us, label = "SL")
+
+RI_i = 80; 
+RI_f = 40;
+G_u_i = (mean_G_u(p.r_u, p.k_u, p.S, p.beta, RI_i, p.severity))
+plt.plot(RI_i, G_u_i, "o",  c= line[0].get_color(), ms = 10)
+plt.plot(RI_f, G_u_i*0.95, "o", c= line[0].get_color(), ms = 10)
+
+
+plt.legend(loc = "lower right")
+plt.xlabel("RI")
+plt.ylabel("$G_u$")
 ```

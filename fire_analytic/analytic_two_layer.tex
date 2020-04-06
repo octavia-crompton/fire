@@ -1,66 +1,31 @@
-\documentclass[12pt]{article}
-\usepackage[parfill]{parskip}
+\documentclass{article}
 
+\usepackage[inner=3cm,outer=3cm]{geometry} %left=4cm,right=2cm would be equivalent
 \usepackage[utf8]{inputenc}
-
-\title{NSF proposal}
-\author{Octavia Crompton}
-\date{July 2019}
-
-% \usepackage[,inline]{trackchanges}
-\usepackage{scrextend}
-
-% \usepackage[numbers]{natbib}
-\usepackage[sort&compress]{natbib}
-\usepackage[margin=1in]{geometry}
-\usepackage{caption}
-% \captionsetup[figure]{font=small,labelfont=bf,textfont=bf}
-% \captionsetup[figure]{font=small,labelfont=bf}
-\captionsetup[figure]{font=small,labelfont=bf}
+%\usepackage{hyperref}
+%\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{parskip}
 \usepackage{graphicx}
-\usepackage{wrapfig}
-\usepackage{sidecap}
-% \usepackage{apacite}
-
-% \usepackage[colorlinks]{hyperref}
-\usepackage[dvipsnames]{xcolor}
-
-\usepackage{amssymb,amsmath}
-\usepackage{kpfonts,baskervald}
-\usepackage{scalerel}
-\usepackage{array}
-\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-
-
-\usepackage[compact]{titlesec}
-% \titlespacing{\section}{0pt}{*1.}{*1.5}
-% \titlespacing{\subsection}{0pt}{*1.2}{*1.2}
-% \titlespacing{\subsection}{10pt}{*0}{*0}
-
-
-\usepackage{enumitem}
-\definecolor{bluePigment}{rgb}{0.2, 0.2, 0.6}
-\renewcommand{\figurename}{\color{bluePigment}{Figure}}
-
-\definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
+\usepackage{placeins}
 \usepackage{float}
-\renewcommand{\rmdefault}{phv} % Arial
-\renewcommand{\sfdefault}{phv} % Arial
+\usepackage{listings}
+\usepackage{color}
 
-% \renewcommand{\doiprefix}{}
-% \newcommand{\doi}[1]{https://doi.org/#1}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
 
-% \pagenumbering{gobble}
+
+
+\usepackage{xcolor}
+\newcommand{\code}[1]{\texttt{#1}}
+\author{octavia Crompton}
 
 \begin{document}
-% \maketitle
-
-
-
-
-\subsection*{ Equations and assumptions}
+\tableofcontents		
+\section{ A two layer model}
+\subsection{ Equations and assumptions}
 
 The equations for the upper  and lower  canopies are:
 
@@ -75,12 +40,12 @@ The equations for the upper  and lower  canopies are:
 \end{equation}
 
 
-where subscripts indicate the canopy level, $G$ is the biomass density, $r$ is the growth rate, $k$ is the carrying capacity, and $\alpha$ is a competition parameter, which effects the lower canopy only. 
+where subscripts indicate the canopy level, $G$ is the biomass density, $r$ is the growth rate, $k$ is the carrying capacity, and $\alpha$ is a competition parameter, which effects the lower canopy only.
 
 A vegetation growth limiting factor, $S^\beta$, slows the biomass growth rates as soil moisture decreases; this effect increases with increasing $\beta$.
 
 
-Assume that fires occur with fixed return interval $\xi$  and severity $\phi_S$. 
+Assume that fires occur with fixed return interval $\xi$  and severity $\phi_S$.
 
 The biomass immediately before each fire  ($G_{u,max}$) and immediately after ($G_{uo}$) are related as:
 
@@ -95,8 +60,7 @@ where $\phi_R$ is the proportion of biomass that remains after each fire.  Defin
 \end{equation}
 
 
-\subsection*{  Analytic solution for the upper canopy}
-
+\subsection{  Analytic solution for the upper canopy}
 
 Equation \ref{G_u}  is the logistic equation, and  has an analytic solution:
 \begin{equation}
@@ -104,7 +68,7 @@ Equation \ref{G_u}  is the logistic equation, and  has an analytic solution:
     \label{logistic_solution}
 \end{equation}
 
-where  $G_{uo}$  is the initial biomass, and $r'_u =  r_u S^\beta  $  combines the growth rate and growth-limiting factor into an `effective` growth rate.  
+where  $G_{uo}$  is the initial biomass, and $r'_u =  r_u S^\beta  $  combines the growth rate and growth-limiting factor into an `effective` growth rate.
 
 If time is measured as the time since the previous fire, then $G_u(t = 0) = G_{uo}$ and  $G_u(t = \xi) = G_{u,max}$  (once the system is in a dynamic steady state):
 
@@ -113,7 +77,7 @@ If time is measured as the time since the previous fire, then $G_u(t = 0) = G_{u
 \end{equation}
 
  Solving for $G_{uo}$:
- 
+
 \begin{equation}
   G_{uo} =  k_u \  \frac{\phi_R - e^{-r'_u \xi} }{1 - e^{-r'_u \xi}}
 \end{equation}
@@ -130,7 +94,7 @@ Or, in terms of severity:
 Integrate Equation \ref{logistic_solution} to get average $G_u$:
 
 \begin{equation*}
- \int_{G_{uo}}^{G_{u,max}} G_u dt = 
+ \int_{G_{uo}}^{G_{u,max}} G_u dt =
  \int_{0}^\xi \frac{k_u G_{uo}}{G_{uo} +(k_u-G_{uo}) e^{- r'_u t}}dt
 \end{equation*}
 
@@ -161,37 +125,98 @@ Substitute Equation  \ref{G_uo} and simplify:
  \frac{k_u}{r'_u \xi}\log \big(1 +   \frac{1- \phi_S - e^{-r'_u \xi} }{1 - e^{-r'_u \xi}} ( 1 - e^{-r'_u \xi})\big)
 \end{equation}
 
-    
+
 \begin{equation}
 \hat{G}_u =
   k_u \big( 1 + \frac{1}{r'_u \xi} \log(1-\phi_S) \big)
 		\label{G_u_mean}
 \end{equation}
 
+     
+\subsection{A modified logistic equation for the lower canopy}
+    
+    The equation for the lower canopy  is:
+    
+     \begin{equation}
+        \frac{d G_l}{dt} = r_l S^\beta G_l \bigg(1-\frac{G_l}{k_l}\bigg) - \alpha G_u G_l
+    \end{equation}
+    
+    Since we have an analytic solution for $\hat G_u$,  we can modify the logistic equation to solve for $\hat G_l$.
+    Rewrite $G_l$  in logistic equation form:
+    
+      \begin{equation}
+        \frac{d G_l}{dt} = r'_l \bigg(1-\frac{G_l}{k'_l}\bigg)
+    \end{equation}
 
-\subsection*{Stability: conditions to sustain upper canopy biomass}
+    where $r'_l = r_l S^\beta - \alpha \hat G_u$ and $k'_l  = k_l r'_l / r_l S^\beta$.
+    
+    The analytic solution for $G_{uo}$ (Equation \ref{G_uo}) can then be used to estimate $G_l$ after the fire:
+    
+    \begin{eqnarray}
+      G_{lo} =  k'_l \   \frac{1- \phi_S - e^{-r'_l \xi} }{1 - e^{-r'_l \xi}}
+    \end{eqnarray}
+    
+     Similarly, the analytic solution for the mean  biomass (Equation \ref{G_u_mean}) can be used to estimate  $\hat G_l$:
+    
+    \begin{equation}
+    \hat{G}_l =
+     		k'_l \bigg( 1 + \frac{1}{r'_l \xi} \log(1-\phi_S) \bigg)
+    \label{hatG_l}
+    \end{equation}
+    
+    Substitute $\hat G_u$ (Equation \ref{G_u_mean}) into $r'_l = r_l S^\beta - \alpha \hat G_u$ to get the modified growth rate:
+    
+    \begin{equation}
+    r'_l= r_l S^\beta   - \alpha k_u \big( 1 + \frac{1}{r'_u \xi} \log(1-\phi_S) \big)
+    \end{equation}
+    
+    And similarly for  $k'_l  = k_l r'_l / r_l S^\beta$:
+    
+    \begin{equation}
+    k'_l= \frac{k_l}{r_l S^\beta } \bigg[  r_l S^\beta   - \alpha k_u \big( 1 + \frac{1}{r'_u \xi} \log(1-\phi_S) \big) \bigg]
+    \end{equation}
+    
+    Which simplifies to:
+    
+    \begin{equation}
+    k'_l=  k_l  \bigg[ 1 -  \frac{  \alpha k_u} {r_l S^\beta }\big( 1 + \frac{1}{r'_u \xi} \log(1-\phi_S) \big) \bigg]
+    \end{equation}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%% STABILITY %%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Stability}
 
-Requiring that $\hat{G}_u >0$ in Equation \ref{G_u_mean} yields:
+\subsection{Stability: conditions to sustain upper canopy biomass}
 
-\begin{equation}
-\phi_S < 1- e^{-r'_u \xi}
-\end{equation}
+        Requiring that $\hat{G}_u >0$ in Equation \ref{G_u_mean} yields:
+        
+        \begin{equation}
+        \phi_S < 1- e^{-r_u S^\beta \xi}
+        \end{equation}
+        
+        In terms of return time:
+        
+        \begin{equation}
+        \xi > - \frac{1}{r_u S^\beta}\log (1 - \phi_S)
+        \end{equation}
 
-In terms of return time:
+	For lower growth rates, a longer return interval is needed to sustain biomass.  Increasing $\beta$ and/or decreasing $S$  lowers the effective upper canopy growth rate
+	
 
-\begin{equation}
-\xi > - \frac{1}{r'_u}\log (1 - \phi_S) 
-\end{equation}
-
-For lower growth rates, a longer return interval is needed to sustain biomass.
+% Figure
+\begin{figure}[h]
+ \centering
+\includegraphics[width=33pc]{../fire_plots/stability_min_RI.png}
+ \caption{ (a) }
+ \label{fig:stability_min_RI.png}
+ \end{figure}
+ 
+         
 If $\beta>0$, a longer return time is needed for lower soil moisture conditions:
 
-\begin{equation}
-\xi > - \frac{1}{r_u S^\beta}\log (1 - \phi_S)
-\end{equation}
 
 Rearranging to find the minimum soil moisture to sustain the upper canopy:
- 
+
 \begin{equation}
 S > \bigg( - \frac{1}{r_u \xi }\log (1 - \phi_S)\bigg)^{1/\beta}
 \end{equation}
@@ -203,144 +228,42 @@ S > \bigg( - \frac{1}{r_u \xi }\log (1 - \phi_S)\bigg)^{1/\beta}
 	  & \text{if  } S > \big( - \frac{1}{r_u \xi }\log (1 - \phi_S)\big)^{1/\beta}
 		\\[10pt]
       0 & \text{otherwise}
-    \end{cases}       
+    \end{cases}
 \end{equation}
 
 
 
-
-\subsection*{Return interval and severity are related}
-
-Suppose $\hat G_u = \gamma k_u$, where $\gamma<1$. From  Equation \ref{G_u_mean}:
-
-\begin{equation}
-\gamma =  1 + \frac{1}{r'_u \xi} \log(1-\phi_S) 
-\end{equation}
-
-\begin{equation}
-\xi = -\frac{1}{r'_u (1-\gamma) }\log(1-\phi_S)
-\end{equation}
-
-Rearranging for $\phi_S$: 
-
-\begin{equation}
-\phi_S = 1- e^{-\xi r'_u (1-\gamma)}
-\end{equation}
-
-\textbf{Take-away}
- The relationship between $\hat G_u$ and $k_u$ constrains that between $RI$ and severity, and vice versa.
-
-
-\subsection*{A modified logistic equation for the lower canopy}
-
-The equation for the lower canopy  is:
-
- \begin{equation}
-    \frac{d G_l}{dt} = r_l S^\beta G_l \bigg(1-\frac{G_l}{k_l}\bigg) - \alpha G_u G_l
-\end{equation}
-
-Since we have an analytic solution for $\hat G_u$,  we can modify the logistic equation to solve for $\hat G_l$.
-Rewrite $G_l$  in logistic equation form:
-
-  \begin{equation}
-    \frac{d G_l}{dt} = r'_l \bigg(1-\frac{G_l}{k'_l}\bigg)
-\end{equation}
-
-where $r'_l = r_l S^\beta - \alpha \hat G_u$ and $k'_l  = k_l r'_l / r_l S^\beta$.
-
-The analytic solution for $G_{uo}$ (Equation \ref{G_uo}) can then be used to estimate $G_l$ after the fire:
-
-\begin{eqnarray}
-  G_{lo} =  k'_l \   \frac{1- \phi_S - e^{-r'_l \xi} }{1 - e^{-r'_l \xi}}
-\end{eqnarray}
-
- Similarly, the analytic solution for the mean  biomass (Equation \ref{G_u_mean}) can be used to estimate  $\hat G_l$:
-
-\begin{equation}
-\hat{G}_l =
- 		k'_l \bigg( 1 + \frac{1}{r'_l \xi} \log(1-\phi_S) \bigg)
-\label{hatG_l}
-\end{equation}
-    
-Substitute $\hat G_u$ (Equation \ref{G_u_mean}) into $r'_l = r_l S^\beta - \alpha \hat G_u$ to get the modified growth rate:
-    
-\begin{equation}
-r'_l= r_l S^\beta   - \alpha k_u \big( 1 + \frac{1}{r'_u \xi} \log(1-\phi_S) \big)
-\end{equation}
+\subsection{Stability: Relating return interval and severity for the upper canopy}
+        
+        Suppose $\hat G_u = \gamma k_u$, where $\gamma<1$. From  Equation \ref{G_u_mean}:
+        
+        \begin{equation}
+        \gamma =  1 + \frac{1}{r'_u \xi} \log(1-\phi_S)
+        \end{equation}
+        
+        \begin{equation}
+        \xi = -\frac{1}{r'_u (1-\gamma) }\log(1-\phi_S)
+        \end{equation}
+        
+        Rearranging for $\phi_S$:
+        
+        
+        \begin{equation}
+        \phi_S = 1- e^{-\xi r'_u (1-\gamma)}
+        \label{max_severity}
+        \end{equation}
+        
+        
+        
+ \begin{figure}[h]
+ \centering
+\includegraphics[width=25pc]{../fire_plots/stability.png}
+ \caption{ The relationship between $\hat G_u$ and $k_u$ constrains that between $RI$ and severity, and vice versa.}
+ \label{fig:stability}
+ \end{figure}
    
-And similarly for  $k'_l  = k_l r'_l / r_l S^\beta$:
-    
-\begin{equation}
-k'_l= \frac{k_l}{r_l S^\beta } \bigg[  r_l S^\beta   - \alpha k_u \big( 1 + \frac{1}{r'_u \xi} \log(1-\phi_S) \big) \bigg]
-\end{equation}
+\subsection{Stability: maximum return interval for a lower canopy}
 
-Which simplifies to:
-
-\begin{equation}
-k'_l=  k_l  \bigg[ 1 -  \frac{  \alpha k_u} {r_l S^\beta }\big( 1 + \frac{1}{r'_u \xi} \log(1-\phi_S) \big) \bigg]
-\end{equation}   
-
-\subsection*{How does biomass change with decreasing soil moisture?}
-
-The derivative of $\hat G_u$ with respect to soil moisture is:
-
-\begin{equation}
-\frac{ d\hat{G}_u }{dS} =
-    \begin{cases}
-      \frac{-\beta k_u }{r_u \xi} \log(1-\phi_S) S^{-(1+\beta)}
-		& \text{if  } S > \big( - \frac{1}{r_u \xi }\log (1 - \phi_S)\big)^{1/\beta}
-		\\[10pt]
-      0 & \text{otherwise}
-    \end{cases}       
-\end{equation}
-
-
-For the lower canopy, the derivative is:
-
-\begin{equation}
-\frac{ d\hat{G}_l }{dS} =
-    \begin{cases}
-	  \frac{\beta  {k_l} }{{r_l} {r_u}} S^{-2 \beta -1}
-\big( {r_u} S^{\beta }(\alpha  {k_u}  - Z) +2 Z \alpha  {k_u} 
-   \big)
-	  & \text{if  } S > \big( - \frac{1}{r_l \xi }\log (1 - \phi_S)\big)^{1/\beta}
-		\\[10pt]
-        \frac{-\beta k_l }{r_l \xi} \log(1-\phi_S) S^{-1-\beta} & \text{otherwise}
-    \end{cases}       
-\end{equation}
-
-
-where
-
-\begin{equation}
-Z = \frac{\log({1-\phi_S})}{\xi}
-\end{equation}
-
- $\frac{d \hat{G}_l}{dS}$  has a minimum value where 
-  
-  \begin{equation}
-  \big( {r_u} S^{\beta }(\alpha  {k_u}  - Z) +2 Z \alpha  {k_u} 
-   \big) = 0
-\end{equation}
-
-Rearranging:
-
-  \begin{equation}
- S^{\beta } = \frac{-2 Z \alpha  {k_u} }{{r_u}(\alpha  {k_u}  - Z)  }
-\end{equation}
-
-Using the definition of $Z$:
-
-  \begin{equation}
- S^{\beta } = \frac{-2 {\log({1-\phi_S})} \alpha  {k_u} }{{r_u}(\alpha  {k_u} \xi - {\log({1-\phi_S})})  }
-\end{equation}
-
-The numerator and denominator are both always positive (because $- \log(1-\phi_S) > 0$), so we expect a minima in $\hat G_l$ for $\alpha > 0$.
-
- $\frac{d \hat{G}_l}{dS}$ has a discontinuity at  $ S = \big( - \frac{1}{r_l \xi }\log (1 - \phi_S)\big)^{1/\beta}$, where $G_l$ has a maximum value.   
-
-
-\subsection*{Maximum return interval for a lower canopy}
 
 Equation \ref{hatG_l} can be used to estimate the conditions for which $\hat G_l >0$:
 
@@ -358,18 +281,18 @@ With some math:
 
 \begin{equation}
  	\xi > - \frac{\log(1-\phi_S)}{r_u S^\beta} \frac{\alpha k_u - r_u S^\beta}{\alpha k_u - r_l S^\beta}
-\end{equation} 
+\end{equation}
 
 
-  \subsection*{$\hat G_l$ along a `stability' curve?}
-  
+  \subsection{$\hat G_l$ along a `stability' curve?}
+
 What happens if we move  $G_l$ along the `stability' curve, $\phi_S = 1- e^{-\xi r'_u (1-\gamma)}$?
 
-This expression can be re-witten as: 
+This expression can be re-witten as:
 
  $\frac{\log(1 - \phi_S)}{  r'_u \xi  }= -  (1 - \gamma )$
- 
- 
+
+
  Substituting into the equations for $r'_l$ and $k'_l$:
 
 \begin{equation}
@@ -379,7 +302,7 @@ r'_l= r_l S^\beta   - \alpha k_u \gamma
 
 \begin{equation}
  k'_l  = k_l  \bigg(1  - \frac{\alpha k_u \gamma} { r_l S^\beta}\bigg)
-\end{equation}   
+\end{equation}
 
 
 Substituting into the Equation for $\hat G_l$:
@@ -393,7 +316,7 @@ Substituting into the Equation for $\hat G_l$:
 
 \begin{equation}
 \hat{G}_l =
- 		  k_l  \bigg(1  - \frac{\alpha k_u \gamma} { r_l S^\beta}\bigg) 
+ 		  k_l  \bigg(1  - \frac{\alpha k_u \gamma} { r_l S^\beta}\bigg)
 		  \bigg( 1 - \frac{(1 - \gamma) r_u  S^\beta }{(r_l S^\beta   - \alpha k_u \gamma)}   \bigg)
 \end{equation}
 
@@ -407,26 +330,12 @@ Substituting into the Equation for $\hat G_l$:
 
 \textbf{Take-away}
  The relationship between $\hat G_u$ and $k_u$ also determines how $\hat G_l$ depends on RI and severity.
- 
+
 Above, with $G_l= \gamma k_u$,  $\hat{G}_l$ does not depend on return interval or severity.
 
-$$
-\frac{\alpha  {k_l} {k_u} ({k_l} ({r_u}+z)-\chi 
-   {G_l} {r_u})-{r_u} (\chi  {G_l} {r_l}
-   ({G_l}-{k_l})+{k_l} ({k_l}
-   ({r_l}+z)-{G_l} {r_l}))}{{r_l} {r_u} (\chi
-    {G_l}-{k_l})} = 0
-   $$
-   
-   
-   
-$$
-{\alpha  {k_l} {k_u} ({k_l} ({r_u}+z)-\chi 
-   {G_l} {r_u})-{r_u} (\chi  {G_l} {r_l}
-   ({G_l}-{k_l})+{k_l} ({k_l}
-   ({r_l}+z)-{G_l} {r_l}))}
- = 0
-   $$
+
+
+
 
 \subsection*{Modify ignition probability to decrease with increasing $S$}
 
@@ -470,7 +379,7 @@ G_{u,max}  = k_u \frac{1}{1 + \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u
 \end{equation}
 
 
-$G_{u,max} \sim k_u$ when $x$ is very small. 
+$G_{u,max} \sim k_u$ when $x$ is very small.
 Suppose we want $G_{u,max} = \gamma k_u$, where $\gamma$ is close to but less than 1.  Then:
 
 
@@ -491,13 +400,13 @@ Rewriting as  $x = 1/\gamma  - 1= C$ (where $C> 0$):
 Rearranging gives:
 
 \begin{equation}
- \phi_S   =  \frac{C(1 - e^{-r'_u \xi})}{C  - e^{-r'_u \xi}} 
+ \phi_S   =  \frac{C(1 - e^{-r'_u \xi})}{C  - e^{-r'_u \xi}}
  \label{phi_S_RI}
  \end{equation}
 
 This is an expression for the severity $ \phi_S $ at which $G_u = \gamma k_u$.
 
-Rearranging, the expression for $\xi$ is: 
+Rearranging, the expression for $\xi$ is:
 
 
 \begin{equation}
@@ -510,9 +419,157 @@ In the limit that  $G_u = k_u$, $C=0$.
  This is reassuring.
 
 
-\subsection*{Estimating growth rates from timescales} 
 
-Estimate the growth rates from the times for an isolated canopy to grow from $a k_u$ to $b k_u$, where $a$ and $b$ are constants less than 1.  
+
+\section{Soil moisture}
+
+\subsection{How does biomass change with decreasing soil moisture?}
+
+    The derivative of $\hat G_u$ with respect to soil moisture is:
+    
+    \begin{equation}
+    \frac{ d\hat{G}_u }{dS} =
+        \begin{cases}
+          \frac{-\beta k_u }{r_u \xi} \log(1-\phi_S) S^{-(1+\beta)}
+    		& \text{if  } S > \big( - \frac{1}{r_u \xi }\log (1 - \phi_S)\big)^{1/\beta}
+    		\\[10pt]
+          0 & \text{otherwise}
+        \end{cases}
+    \end{equation}
+    
+    
+    For the lower canopy, the derivative is:
+    
+    \begin{equation}
+    \frac{ d\hat{G}_l }{dS} =
+        \begin{cases}
+    	  \frac{\beta  {k_l} }{{r_l} {r_u}} S^{-2 \beta -1}
+    \big( {r_u} S^{\beta }(\alpha  {k_u}  - Z) +2 Z \alpha  {k_u}
+       \big)
+    	  & \text{if  } S > \big( - \frac{1}{r_l \xi }\log (1 - \phi_S)\big)^{1/\beta}
+    		\\[10pt]
+            \frac{-\beta k_l }{r_l \xi} \log(1-\phi_S) S^{-1-\beta} & \text{otherwise}
+        \end{cases}
+    \end{equation}
+    
+    
+    where
+    
+    \begin{equation}
+    Z = \frac{\log({1-\phi_S})}{\xi}
+    \end{equation}
+    
+     $\frac{d \hat{G}_l}{dS}$  has a minimum value where
+    
+      \begin{equation}
+      \big( {r_u} S^{\beta }(\alpha  {k_u}  - Z) +2 Z \alpha  {k_u}
+       \big) = 0
+    \end{equation}
+    
+    Rearranging:
+    
+      \begin{equation}
+     S^{\beta } = \frac{-2 Z \alpha  {k_u} }{{r_u}(\alpha  {k_u}  - Z)  }
+    \end{equation}
+    
+    Using the definition of $Z$:
+    
+      \begin{equation}
+     S^{\beta } = \frac{-2 {\log({1-\phi_S})} \alpha  {k_u} }{{r_u}(\alpha  {k_u} \xi - {\log({1-\phi_S})})  }
+    \end{equation}
+    
+    The numerator and denominator are both always positive (because $- \log(1-\phi_S) > 0$), so we expect a minima in $\hat G_l$ for $\alpha > 0$.
+    
+     $\frac{d \hat{G}_l}{dS}$ has a discontinuity at  $ S = \big( - \frac{1}{r_l \xi }\log (1 - \phi_S)\big)^{1/\beta}$, where $G_l$ has a maximum value.
+    
+
+\subsection*{Modify ignition probability to decrease with increasing $S$}
+
+Suppose the probability of ignition is: $p = \frac{1-S}{\xi}$.
+
+The effective return time will be: $\xi' = \frac{\xi} { 1- S}$, and the equation for $\hat{G}_u $ becomes:
+
+\begin{equation}
+\hat{G}_u =
+  k_u \big( 1 + \frac{(1-S)}{r_u S^\beta \xi} \log(1-\phi_S) \big)
+\end{equation}
+
+where $\xi$ is now interpretable as the return interval where $S=1$.
+
+ \subsection*{ $G_u$ approaches $k_u$  leading up to each fire. How close does it get?}
+
+The  pre-fire biomass is:
+
+\begin{equation}
+  G_{u,max} =  \frac{k_u }{1-\phi_S}   \frac{1- \phi_S - e^{-r'_u \xi} }{1 - e^{-r'_u \xi}}
+  \label{G_u_max}
+\end{equation}
+
+Expanding, we have:
+
+\begin{equation}
+  G_{u,max} =  k_u  \frac{1- \phi_S - e^{-r'_u \xi} }{1  - \phi_S - e^{-r'_u \xi} + \phi_S  e^{-r'_u \xi}}
+\end{equation}
+
+
+Define $x$ as:
+
+\begin{equation}
+x = \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}}
+\end{equation}
+
+so $ G_{u,max} = k_u /(1+x)$:
+
+\begin{equation}
+G_{u,max}  = k_u \frac{1}{1 + \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}}}
+\end{equation}
+
+
+$G_{u,max} \sim k_u$ when $x$ is very small.
+Suppose we want $G_{u,max} = \gamma k_u$, where $\gamma$ is close to but less than 1.  Then:
+
+
+\begin{equation}
+ k_u /(1+x) = \gamma k_u
+\end{equation}
+
+Rewriting as  $x = 1/\gamma  - 1= C$ (where $C> 0$):
+
+\begin{equation}
+ \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}} =  1/\gamma  - 1 = C
+\end{equation}
+
+\begin{equation}
+{ \phi_S  e^{-r'_u \xi}} = C ({1- \phi_S - e^{-r'_u \xi}} )
+\end{equation}
+
+Rearranging gives:
+
+\begin{equation}
+ \phi_S   =  \frac{C(1 - e^{-r'_u \xi})}{C  - e^{-r'_u \xi}}
+ \label{phi_S_RI}
+ \end{equation}
+
+This is an expression for the severity $ \phi_S $ at which $G_u = \gamma k_u$.
+
+Rearranging, the expression for $\xi$ is:
+
+
+\begin{equation}
+\xi   =  \frac{1}{r'_u}\log \frac{C  +\phi_S } {C(1 - \phi_S)}
+ \label{RI_phi_S}
+ \end{equation}
+
+In the limit that  $G_u = k_u$, $C=0$.
+ Equation \ref{phi_S_RI} yields $\phi_S = 0$,  and Equation \ref{RI_phi_S} yields $\xi \rightarrow \inf$.
+ This is reassuring.
+
+
+
+\section{Estimating parameters}
+\subsection{Estimating growth rates from timescales}
+
+Estimate the growth rates from the times for an isolated canopy to grow from $a k_u$ to $b k_u$, where $a$ and $b$ are constants less than 1.
 Substituting into the logistic equation solution (with $ G_uo = a k_u$):
 
 \begin{equation}
@@ -545,10 +602,9 @@ Estimate, growth rates from timescale to mature:
 \end{itemize}
 
 
-\subsection*{Non-dimensionalize}
+\section{Non-dimensionalize}
 
-
- the equations for the upper and lower canopies:
+The equations for the upper and lower canopies:
 
 \begin{equation*}
 	 \frac{d G_u}{dt} =
@@ -560,6 +616,8 @@ Estimate, growth rates from timescale to mature:
 	 \frac{d G_l}{dt} = r_l S^\beta G_l \bigg(1-\frac{G_l}{k_l}\bigg) - \alpha G_l G_u
 \end{equation*}
 
+Non-dimensionalize the upper canopy:
+
 \begin{equation*}
     \frac{d G_u}{dt} =
      \frac{r_u S^\beta}{r_u S^\beta} \frac{G_u}{dt} =
@@ -567,7 +625,7 @@ Estimate, growth rates from timescale to mature:
 	r_u S^\beta \frac{G_u}{d \tau}
 \end{equation*}
 
-where $\tau = r_u S^\beta t$
+where $\tau = r_u S^\beta t$.  Simplifying:
 
 \begin{equation*}
     \frac{d G_u}{d\tau} =
@@ -591,10 +649,6 @@ Moving on to the lower canopy.  Substituting $\tau$ for $t$:
 Let  $g_l = G_l/k_l$, or   $G_l =   k_l g_l$.  Then:
 
 \begin{equation*}
-r_u   k_l  S^\beta \frac{d g_l}{d \tau } = r_l S^\beta k_l g_l \big(1-g_l \big) - \alpha g_l k_l g_u k_u
-\end{equation*}
-
-\begin{equation*}
 r_u   S^\beta \frac{d g_l}{d \tau } = r_l S^\beta k_l g_l \big(1-g_l \big) - \alpha g_l k_l g_u k_u
 \end{equation*}
 
@@ -602,9 +656,10 @@ r_u   S^\beta \frac{d g_l}{d \tau } = r_l S^\beta k_l g_l \big(1-g_l \big) - \al
  \frac{d g_l}{d \tau } =\frac{ r_l}{r_u }  g_l \big(1-g_l \big) - \frac{\alpha k_u}{r_u  S^\beta}  g_l g_u
 \end{equation*}
 
-So our dimensionless groups are $r_l/r_u$ and $\alpha k_u / S_\beta r_u$, which are a generalized growth rate and competition, respectively.
+So the dimensionless groups are $r_l/r_u$ and $\alpha k_u / S_\beta r_u$, which are a generalized growth rate and competition, respectively.  The rescaled time also need to be factored in:  $\tau = r_u S^\beta t$
 
 
+%%. 
 We have several fixed parameters:  $k_u = 20$, $r_u = 0.25$, $S=0.21$.
 
 $\alpha$ ranges from 0 (no competition) to 0.1,
@@ -614,63 +669,15 @@ let  $r = r_l/r_u$ and $\phi =  \alpha k_u / S_\beta r_u$,
 
 if $r_l$ ranges from 0.25 to 2.5,  $r$ ranges from 1 to 10.
 
-\subsection*{Is Inertia a useful concept?}
 
-What if we want to understand in terms of `intertia' relative to `competition'.
+\section{Code notes}
 
-
-\begin{equation}
-    \frac{1}{S^\beta}    \frac{dG_u}{dt} =  r_{u}  G_u \big(1-\frac{G_u}{k_u}\big)
-\end{equation}
-
- \begin{equation}
-    \frac{1}{S^\beta}    \frac{d G_l}{dt} = r_l  G_l \big(1-\frac{G_l}{k_l}\big) - \frac{\alpha}{S^\beta} G_u G_l,
-\end{equation}
-
-What is the best way to rewrite the expressions to convey intertia? 
+\code{all\_params()} returns the default parameters, which are overwritten when the RCSR class is initialized. 
+The only was to change the RCSR parameters is to reinitialize!  
 
 
 
-\subsection{Dodo's model}
 
-The growth of normalized tree biomass, $v$, in periods between fire occurrences is modeled with a logistic equation;
-the growth rate is proportional to existing tree biomass and to the available resources $1-v$.
-
-The temporal dynamics are expressed by stochastic equation:
-
-\begin{equation}
-\frac{dv}{dt} = \alpha v ( 1- v) - v F(t, v)
-\label{dodo}
-\end{equation}
-
-$\alpha$ measures the inertia of the system, i.e. encroachment rate of trees and shrubs;
-$F(t,v) $ is the disturbance caused by fires.
-
-In mesic savannas, average fire frequency, $\lambda$, increases with increasing grass biomass.
-
-
-Fire frequency is modeled as a linear function of $v$:
-$\lambda  = \lambda_0 + bv$.
-
-Like our model, 
-the amount of tree vegetation killed by fires is proportional to the existing woody vegetation, $v$, and to the random variable $\omega$, measuring fire intensity.
-
-
-\begin{equation}
-\frac{dv}{dt} = \alpha v ( 1- v) - v F(t, v)
-\end{equation}
-
-
-Equation \ref{dodo} can be solved by transformation into an equation with no multiplicative noise, with $y = \log(v)$.
-
-\begin{equation}
-\frac{dy}{dt} = \alpha  ( 1- e^y ) -  F(t, v)
-\label{dodo2}
-\end{equation}
-
-$F(t,v)$ is a. Poisson process of fire occurrence with rate $\lambda = \lambda_0 + b e^y$.
-
-Equation \ref{dodo2} is integrated to get a steady state probability distribution of $y$.
 
 %  \subsection*{Lower canopy equilibrium}
 %
