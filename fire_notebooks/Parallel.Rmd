@@ -1,0 +1,78 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.4.1
+  kernelspec:
+    display_name: fire3
+    language: python
+    name: fire3
+---
+
+```{python}
+# %autosave 0
+```
+
+```{python}
+import os
+startup_file = "/Users/octavia/Dropbox/fire/src_v1/startup.py"
+```
+
+```{python}
+run "/Users/octavia/Dropbox/fire/src_v1/startup.py"
+```
+
+```{python}
+
+from multiprocessing import Pool
+
+updates = [{"dt_p" : np.round(s, 5)} for  s in  [0.1, 1]]
+        
+def f(update):
+    
+    p = RCSR()
+    
+    param = all_params()
+    param.update({
+              "ti" : 10000, 
+              "tmax" : 1000,
+              "RI" : 29,
+              "severity" : 0.7,
+              "severity_type" : "random",
+              "ignition_type" : "random"
+         })
+    param.update(update)
+
+    p = RCSR(param)
+    p.run()
+    return p
+
+pool = Pool(processes=8)              # start 4 worker processes
+
+
+result =  (pool.map(f, updates)  )        # prints "[0, 1, 4,..., 81]"
+pool.close()
+
+p = result[0]
+
+```
+
+```{python}
+for i, p in enumerate(result):
+    to = - int(5*p.RI/p.dt_p)
+    plt.plot(p.t_p[to:], p.G_u_list[to:], '-', label = print_dict(updates[i]))
+plt.legend()
+```
+
+```{python}
+canopy_plot(p, nfire = 10)
+```
+
+
+
+```{python}
+
+```

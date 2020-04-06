@@ -433,88 +433,6 @@ The effective return time will be: $\xi' = \frac{\xi} { 1- S}$, and the equation
      $\frac{d \hat{G}_l}{dS}$ has a discontinuity at  $ S = \big( - \frac{1}{r_l \xi }\log (1 - \phi_S)\big)^{1/\beta}$, where $G_l$ has a maximum value.
     
 
-\subsection*{Modify ignition probability to decrease with increasing $S$}
-
-Suppose the probability of ignition is: $p = \frac{1-S}{\xi}$.
-
-The effective return time will be: $\xi' = \frac{\xi} { 1- S}$, and the equation for $\hat{G}_u $ becomes:
-
-\begin{equation}
-\hat{G}_u =
-  k_u \big( 1 + \frac{(1-S)}{r_u S^\beta \xi} \log(1-\phi_S) \big)
-\end{equation}
-
-where $\xi$ is now interpretable as the return interval where $S=1$.
-
- \subsection*{ $G_u$ approaches $k_u$  leading up to each fire. How close does it get?}
-
-The  pre-fire biomass is:
-
-\begin{equation}
-  G_{u,max} =  \frac{k_u }{1-\phi_S}   \frac{1- \phi_S - e^{-r'_u \xi} }{1 - e^{-r'_u \xi}}
-  \label{G_u_max}
-\end{equation}
-
-Expanding, we have:
-
-\begin{equation}
-  G_{u,max} =  k_u  \frac{1- \phi_S - e^{-r'_u \xi} }{1  - \phi_S - e^{-r'_u \xi} + \phi_S  e^{-r'_u \xi}}
-\end{equation}
-
-
-Define $x$ as:
-
-\begin{equation}
-x = \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}}
-\end{equation}
-
-so $ G_{u,max} = k_u /(1+x)$:
-
-\begin{equation}
-G_{u,max}  = k_u \frac{1}{1 + \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}}}
-\end{equation}
-
-
-$G_{u,max} \sim k_u$ when $x$ is very small.
-Suppose we want $G_{u,max} = \gamma k_u$, where $\gamma$ is close to but less than 1.  Then:
-
-
-\begin{equation}
- k_u /(1+x) = \gamma k_u
-\end{equation}
-
-Rewriting as  $x = 1/\gamma  - 1= C$ (where $C> 0$):
-
-\begin{equation}
- \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}} =  1/\gamma  - 1 = C
-\end{equation}
-
-\begin{equation}
-{ \phi_S  e^{-r'_u \xi}} = C ({1- \phi_S - e^{-r'_u \xi}} )
-\end{equation}
-
-Rearranging gives:
-
-\begin{equation}
- \phi_S   =  \frac{C(1 - e^{-r'_u \xi})}{C  - e^{-r'_u \xi}}
- \label{phi_S_RI}
- \end{equation}
-
-This is an expression for the severity $ \phi_S $ at which $G_u = \gamma k_u$.
-
-Rearranging, the expression for $\xi$ is:
-
-
-\begin{equation}
-\xi   =  \frac{1}{r'_u}\log \frac{C  +\phi_S } {C(1 - \phi_S)}
- \label{RI_phi_S}
- \end{equation}
-
-In the limit that  $G_u = k_u$, $C=0$.
- Equation \ref{phi_S_RI} yields $\phi_S = 0$,  and Equation \ref{RI_phi_S} yields $\xi \rightarrow \inf$.
- This is reassuring.
-
-
 
 \section{Estimating parameters}
 \subsection{Estimating growth rates from timescales}
@@ -621,8 +539,8 @@ if $r_l$ ranges from 0.25 to 2.5,  $r$ ranges from 1 to 10.
 
 
 
-
-\section{Time dependence}
+\section{How close does $G_u$ get to $k_u$ ?}
+%%% Code: stability.ipynb, towards the end
  \subsection{ $G_u$ approaches $k_u$  leading up to each fire. How close does it get?}
 
 The  pre-fire biomass is:
@@ -637,7 +555,6 @@ Expanding:
 \begin{equation}
   G_{u,max} =  k_u  \frac{1- \phi_S - e^{-r'_u \xi} }{1  - \phi_S - e^{-r'_u \xi} + \phi_S  e^{-r'_u \xi}}
 \end{equation}
-
 
 Define $x$ as:
 

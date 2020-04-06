@@ -717,8 +717,6 @@ def runmodel(param):
     p.run()
     return p
 
-def print_param(param):
-    return ','.join("%s-%s" % item for item in param.items())
 
 ###########################################################################
 ####################### Code to sample severity ###########################
