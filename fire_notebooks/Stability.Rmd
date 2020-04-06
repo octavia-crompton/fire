@@ -17,28 +17,6 @@ jupyter:
 ```
 
 ```{python}
-
-# import sys
-
-# sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
-
-# mymodules = ['plot_config', "fire_model", "fire_utility", "filepaths",
-#              "fire_plot", "fire_analytic" ]
-
-# for mod in mymodules:
-#     if mod in sys.modules:
-#         del sys.modules[mod]
-
-
-# from plot_config import *
-# from fire_model import *
-# from fire_analytic import *
-# from fire_utility import *
-# from fire_plot import *
-# from filepaths import *
-```
-
-```{python}
 import os
 startup_file = "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 ```
@@ -78,7 +56,7 @@ p = RCSR(params)
 
 ```{python}
 
-fig, ax = plt.subplots(1, figsize = (7,4) )
+fig, ax = plt.subplots(1, figsize = (7,3.5) )
 
 RIs = np.arange(0, 100, .1)
 severities = max_severity_u(p.r_u*p.S**p.beta, RIs)
@@ -212,8 +190,8 @@ ax.set_xlabel(r"$S$")
 ax.set_ylabel("$RI$")
 ax.set_title("Minimum $RI$ to sustain $G_u$")
 ax.legend(title = r"$\beta$")    
-    
-fig.savefig(figdir + '/stability_min_RI.png', format='png', dpi=1000, bbox_inches = "tight")
+fig.savefig(figdir + '/stability_min_RI.png', format='png', dpi=300, bbox_inches = "tight")
+
 
 
 ```
@@ -238,8 +216,8 @@ def G_l_stability_v_beta(p, update,  betas, ax):
     max_RI[max_RI > 100] = np.nan
     min_RI = min_RI_l(p.r_l, p.S, betas, p.severity)
 
-    ax.plot(betas, max_RI, label = "max RI ")
-    ax.plot(betas, min_RI, label = "min RI ")
+    ax.plot(betas, max_RI, label = "max $RI$ ")
+    ax.plot(betas, min_RI, label = "min $RI$ ")
     ax.fill_between(betas, min_RI, max_RI, alpha = 0.1)
 
     ax.legend()
@@ -252,29 +230,28 @@ def G_l_stability_v_beta(p, update,  betas, ax):
 ```
 
 ```{python}
-fig, axes = plt.subplots(1,2, figsize = (14, 4))
-
+fig, axes = plt.subplots(1,2, sharey = True, figsize = (14, 4))
 
 params = all_params()
 
+betas = np.arange(0.3, 1, 0.01)
 ax = axes[0]
-update = {"S" : 0.5}
+update = {"S" : 0.2, "severity" : 0.1}
 params.update(update)
 p = RCSR(params)
 
 ax = G_l_stability_v_beta(p, update, betas, ax)
 
 ax = axes[1]
-update = {"S" : 0.2}
+update = {"S" : 0.5, "severity" : 0.1}
 params.update(update)
 p = RCSR(params)
 
 ax = G_l_stability_v_beta(p, update, betas, ax)
 
-```
+fig.savefig(figdir + '/G_l_stability_v_beta.png', format='png',
+            dpi=300, bbox_inches = "tight")
 
-```{python}
-print_dict(update)
 ```
 
 ## Test out intuition here
@@ -290,147 +267,132 @@ p.run()
 ## Lower canopy stability is sensitive to $\alpha$
 
 ```{python}
-set_defaults()
+def G_l_stability_v_alpha(p, update,  alphas, ax):
+    """
+    Plot the stability of the lower canopy as a function of alpha
+    """
+    max_RI = max_RI_l(p.r_l, p.r_u, p.k_u, p.S, p.beta, alphas, p.RI, p.severity)
+    max_RI[(alphas *p.k_u - p.r_l*p.S**p.beta) < 0.0] = np.nan
+    max_RI[max_RI > 100] = np.nan
+    min_RI = min_RI_l(p.r_l, p.S, p.beta, p.severity)
+    
+    ax.plot(alphas, max_RI, label = print_dict(update))
+    ax.fill_between(alphas, min_RI, max_RI, alpha = 0.1)
 
-alpha = np.arange(0,0.3, 0.01)
+    ax.legend()
+    ax.set_title("Lower canopy stability")
+    ax.set_xlabel(r"$\alpha$")
+    ax.set_ylabel(r"$RI$")
 
-max_RI = max_RI_l(r_l, r_u, k_u, S, beta, alpha, RI, severity)
-max_RI[(alpha *k_u - r_l*S**beta) < 0.0] = np.nan
+    
+    return ax
+```
 
-min_RI = min_RI_l(r_l, S, beta, severity)
-min_RI = np.ones_like(alpha)*min_RI
-plt.plot(alpha, max_RI, label = "max RI ")
-plt.plot(alpha, min_RI, label = "min RI ")
-plt.fill_between(alpha, min_RI, max_RI, alpha = 0.1)
+```{python}
+fig, axes = plt.subplots(1,2, sharey = True, figsize = (14, 4))
 
-plt.legend()
-plt.xlabel(r"$\alpha$")
-plt.ylabel(r"$RI$")
-plt.title("$RI$ bounds for lower canopy stability")
-# With greater competition, more frequent fires are needed to sustain G_l
+alphas = np.arange(0, 0.2, 0.001)
+params = all_params()
+params.update({"S" : 0.2})
+ax = axes[0]
+severities = [0.1, 0.5, 0.9]
+for severity in severities:
+    update = {"severity" : severity}
+    params.update(update)
+    p = RCSR(params)
+    ax = G_l_stability_v_alpha(p, update, alphas, ax)
+
+ax = axes[1]
+betas = [0.1, 0.5, 0.9]
+for beta in betas:
+    update = {"beta" : beta}
+    params.update(update)
+    p = RCSR(params)
+    ax = G_l_stability_v_alpha(p, update, alphas, ax)
+
+fig.savefig(figdir + '/G_l_stability_v_alpha.png', format='png',
+            dpi=300, bbox_inches = "tight")
+
+
 ```
 
 ## Lower canopy stability is sensitive to $r_l$
 
 ```{python}
-set_defaults()
-alpha = 0.06
+
+fig, axes = plt.subplots(1, sharey = True, figsize = (7, 3.5))
+
 r_l = np.arange(0.25, 1.5, 0.01)
 
-max_RI = max_RI_l(r_l, r_u, k_u, S, beta, alpha, RI, severity)
-max_RI[(alpha *k_u - r_l*S**beta) < 0.0] = np.nan
+max_RI = max_RI_l(r_l, p.r_u, p.k_u, p.S, beta, p.alpha, p.RI, p.severity)
+max_RI[(alpha *p.k_u - r_l*p.S**beta) < 0.0] = np.nan
 
-min_RI = min_RI_l(r_l, S, beta, severity)
+min_RI = min_RI_l(r_l, p.S, beta, p.severity)
 
-plt.plot(r_l/r_u, max_RI, label = "max RI ")
-plt.plot(r_l/r_u, min_RI, label = "min RI ")
-plt.fill_between(r_l/r_u, min_RI, max_RI, alpha = 0.1)
+plt.plot(r_l/p.r_u, max_RI, label = "max RI ")
+plt.plot(r_l/p.r_u, min_RI, label = "min RI ")
+plt.fill_between(r_l/p.r_u, min_RI, max_RI, alpha = 0.1)
 
 plt.legend()
 plt.xlabel(r"$r_l / r_u$")
 plt.ylabel(r"$RI$")
 
 plt.title("$RI$ bounds for lower canopy stability")
-# As lower canopy growth rate decreases, so does the range of values for which G_l > 0. 
+
+fig.savefig(figdir + '/G_l_stability_v_rl.png', format='png',
+            dpi=300, bbox_inches = "tight")
+
+
 ```
 
-## There is a range where G_l persists, even though it is not in equilbrium with $G_u$ before the fire
+### There is a range of return intervals where G_l persists, even though its equilbrium value would be zero
 
 ```{python}
-set_defaults()
-RI = np.arange(0, 20, 0.01)
+params = all_params()
+p = RCSR(params)
+RIs = np.arange(0, 20, 0.01)
 
 # mean G_u
-G_u_mean = mean_G_u( r_u, k_u, S, beta, RI, severity)
+G_u_mean = mean_G_u( p.r_u, p.k_u, p.S, p.beta, RIs, p.severity)
+# mean G_l
+G_l_mean = mean_G_l(p.r_l, p.r_u, p.k_l, p.k_u, p.S, p.beta, p.alpha, RIs, p.severity)
 
-#  G_l_eq (equilibrium with G_u pre-fire)
-G_l_eq = G_l_equil(r_l, r_u, k_l,  k_u, S, beta, alpha, RI, severity)
-G_l_mean = mean_G_l(r_l, r_u, k_l,  k_u, S, beta, alpha, RI, severity)
+#  G_l_eq (in equilibrium with G_u pre-fire)
+G_l_eq = G_l_equil(p.r_l, p.r_u, p.k_l,  p.k_u, p.S, p.beta, p.alpha, RIs, p.severity)
+G_l_eq[G_u_mean == 0] = np.nan
 
-#  G_l_eq (equilibrium with G_l post-fire)
-G_l_max_logistic = G_prefire(r_l, k_l, RI, severity)
-G_l_eq[G_u_mean == 0] = G_l_max_logistic[G_u_mean == 0]
+fig, ax = plt.subplots(1, sharey = True, figsize = (7, 3.5))
 
-RI_u_min = min_RI_u(r_u, S, beta, severity)
+RI_u_min = min_RI_u(p.r_u, p.S, p.beta, p.severity)
 
-# plt.plot(RI, G_l_eq/k_l, label = "equil G_l")
-plt.plot(RI, G_l_mean/k_l, '--', label = "mean $G_l/k_l$")
-plt.plot(RI, G_u_mean/k_u, label = "mean $G_u/r_u$")
+ax.plot(RIs, G_l_eq/p.k_l, label = "`steady-state' $G_l$")
+ax.plot(RIs, G_l_mean/p.k_l, '--', label = "$\hat G_l/k_l$")
+ax.plot(RIs, G_u_mean/p.k_u, label = "$\hat G_u/k_u$")
 
-plt.legend()
+ax.legend(loc='center left', bbox_to_anchor=(0.99, 0.5))
 plt.axvline(RI_u_min, c = 'k', lw = 1, ls = '--')
-plt.xlabel("RI")
-```
-
-```{python}
-p = RCSR()
-set_defaults()
-update = {"soil_feedback" : "C",
-          "r_l" : r_l,
-          "r_u" : r_u,
-          "k_l" : k_l,
-          "k_u" : k_u,
-          "alpha" : alpha,
-          "beta" : 0.,
-          "G_u" : k_u/10.,
-          "G_l" : k_l/10., 
-          "ti" : 1000, 
-          "tmax" : 100,
-          "RI" : 15,
-          "severity" : 0.5,
-          "dt" : 0.01
-         }
-
-
-p = RCSR(update)
-p.run()
-
-
-print ("The minimum return interval with severity = {0} is {1:.2f} years".format(p.severity,p.min_RI_u()))
-print ("The maximum severity with RI = {0} years is {1:.4f}".format(p.RI, p.max_severity_u()))
-
-fig, ax = plt.subplots(1, figsize = (14,4) )
-
-to = int(-5*p.RI/p.dt_p)
-ax.plot(p.t_p[to:], p.G_u_list[to:], '-', label ="upper canopy")        
-ax.plot(p.t_p[to:], p.G_l_list[to:], label = "lower canopy")       
-ax.set_ylabel("Biomass")
-ax.legend()
-
-severity = update["severity"]
-
-G_u_min_a = p.G_u_postfire()
-G_u_max_a = G_u_min_a/(1-severity)
-if G_u_min_a>0:
-    plt.axhline(G_u_min_a, ls = "--", lw = 1)
-    plt.axhline(G_u_max_a, ls = "--", lw = 1)
-
-G_l_postfire = p.G_l_postfire()
-if G_l_postfire>0:
-    plt.axhline(p.G_l_postfire(),ls =  '--', lw = 1,c = 'k')
-
+ax.set_xlabel("RIs")
+ax.set_ylabel("normalized mean biomass")
 ```
 
 ## Recovery time for the upper biomass to return to $\gamma k_u$
 
 ```{python}
-
-update = {"soil_feedback" : "C",
+params = all_params()
+update = {
           "alpha" : 0.02,
-          "beta" : 1,
-          "ti" : 0, 
-          "tmax" : 2000,
+          "beta" : 1,          
           "RI" : 29,
           "severity" : 0.5,
-          "dt" : 0.01,
-          "dt_p" : 0.1,
          }
+params.update(update)
+
 
 p = RCSR(update)
 ```
 
 <!-- #region -->
-$$ t = \frac{1}{r} \log\bigg( \frac{\gamma ( \phi_S)}{(1-\gamma)(1 - \phi_S - e^ {-r\omega})}\bigg)$$
+$$ t = \frac{1}{r} \log\bigg( \frac{\gamma  \phi_S}{(1-\gamma)(1 - \phi_S - e^ {-r\omega})}\bigg)$$
 
 where $\xi $ is the return interval.
 

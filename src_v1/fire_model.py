@@ -534,7 +534,7 @@ class RCSR:
         r_lp = self.r_l*self.S**self.beta 
         k_l = self.k_l 
 
-        # G_l_eq     
+        G_l_eq = k_l*(1- alpha*G_u_max/r_lp)    
         
         return max(G_l_eq,0)
 

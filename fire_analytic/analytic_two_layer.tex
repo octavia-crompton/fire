@@ -254,7 +254,7 @@ S > \bigg( - \frac{1}{r_u \xi }\log (1 - \phi_S)\bigg)^{1/\beta}
         \end{equation}
         
         
-%%% Notebook: stability
+%%% Code: see `Stability` notebook
  \begin{figure}[h]
  \centering
 \includegraphics[width=20pc]{../fire_plots/stability.png}
@@ -262,6 +262,8 @@ S > \bigg( - \frac{1}{r_u \xi }\log (1 - \phi_S)\bigg)^{1/\beta}
  \label{fig:stability}
  \end{figure}
    
+   
+ % Section: Stability: maximum return interval for a lower canopy
 \subsection{Stability: maximum return interval for a lower canopy}
 
 
@@ -284,38 +286,58 @@ With some math:
 \end{equation}
 
 In cases where ${\alpha k_u - r_l S^\beta} < 0$, there is no maximum $\xi$ to sustain $G_l$.
+Figure \ref{fig:G_l_stability_v_alpha} shows example stability curves for $\hat G_l$ with varying $\beta$.
+        
+%%% Code: see `Stability` notebook
+ \begin{figure}[h]
+ \centering
+\includegraphics[width=40pc]{../fire_plots/G_l_stability_v_alpha}
+ \caption{ The maximum return interval for which a lower canopy is observed is complicated.  (A) The lower canopy is more stable for higher severity fires; 
+ (B): If  $\alpha$ is small, $\hat G_u$ is stability for small beta; the opposite is observed for large $\alpha$}
+ \label{fig:G_l_stability_v_alpha}
+ \end{figure}
+   
+
+The lower canopy stability is sensitive to $r_l$. As lower canopy growth rate decreases, so does the range of values for which $\hat G_l > 0$ (see Figure \ref{fig:G_l_stability_v_rl}).
+
+ \begin{figure}[h]
+ \centering
+\includegraphics[width=20pc]{../fire_plots/G_l_stability_v_rl}
+ \caption{ }
+ \label{fig:G_l_stability_v_rl}
+ \end{figure}
+  
+
+  \subsection{$\hat G_l$ along the  $\xi - \phi_S$ curves of constant $\hat G_u$}
+
+Does $G_l$ vary along the $\xi - \phi_S$ curves of constant  upper canopy $\hat G_u$?
+Specifying that $\hat G_u = \gamma k_u$ implies the relation between $\phi_S$ and $\xi$:
+$$\phi_S = 1- e^{-\xi r'_u (1-\gamma)}$$
+
+Rearranging:
+
+\begin{equation}
+\frac{\log(1 - \phi_S)}{  r'_u \xi  }= -  (1 - \gamma )
+\end{equation}
 
 
-% see 'max_RI_l in fire_analytic.py
-
-  \subsection{$\hat G_l$ along a `stability' curve?}
-
-What happens if we move  $G_l$ along the `stability' curve, $\phi_S = 1- e^{-\xi r'_u (1-\gamma)}$?
-
-This expression can be re-witten as:
-
- $\frac{\log(1 - \phi_S)}{  r'_u \xi  }= -  (1 - \gamma )$
-
-
- Substituting into the equations for $r'_l$ and $k'_l$:
+ Substituting this constraint into the equations for $r'_l$ and $k'_l$:
 
 \begin{equation}
 r'_l= r_l S^\beta   - \alpha k_u \gamma
 \end{equation}
-
 
 \begin{equation}
  k'_l  = k_l  \bigg(1  - \frac{\alpha k_u \gamma} { r_l S^\beta}\bigg)
 \end{equation}
 
 
-Substituting into the Equation for $\hat G_l$:
+Substituting $r'_l$ and $k'_l$ into the equation for $\hat G_l$:
 
 \begin{equation}
 \hat{G}_l =
  		k'_l \big( 1 - \frac{(1 - \gamma) r'_u }{r'_l }  ) \big)
 \end{equation}
-
 
 
 \begin{equation}
@@ -329,19 +351,14 @@ Substituting into the Equation for $\hat G_l$:
 \hat{G}_l =
  		  {k_l}
 		  \bigg( 1 - \frac{\alpha k_u \gamma - (1 - \gamma) r_u  S^\beta}{r_l S^\beta }  \bigg)
+\label{eq:constrained_G_l}
 \end{equation}
 
-
-\textbf{Take-away}
- The relationship between $\hat G_u$ and $k_u$ also determines how $\hat G_l$ depends on RI and severity.
-
-Above, with $G_l= \gamma k_u$,  $\hat{G}_l$ does not depend on return interval or severity.
+Above, by specifying that  $\hat G_u = \gamma k_u$ ,  $\hat{G}_l$ does not depend on return interval or severity.
 
 
-
-
-
-\subsection*{Modify ignition probability to decrease with increasing $S$}
+\section{Potential feedbacks}
+\subsection{Modify ignition probability to decrease with increasing $S$}
 
 Suppose the probability of ignition is: $p = \frac{1-S}{\xi}$.
 
@@ -351,77 +368,6 @@ The effective return time will be: $\xi' = \frac{\xi} { 1- S}$, and the equation
 \hat{G}_u =
   k_u \big( 1 + \frac{(1-S)}{r_u S^\beta \xi} \log(1-\phi_S) \big)
 \end{equation}
-
-where $\xi$ is now interpretable as the return interval where $S=1$.
-
- \subsection*{ $G_u$ approaches $k_u$  leading up to each fire. How close does it get?}
-
-The  pre-fire biomass is:
-
-\begin{equation}
-  G_{u,max} =  \frac{k_u }{1-\phi_S}   \frac{1- \phi_S - e^{-r'_u \xi} }{1 - e^{-r'_u \xi}}
-  \label{G_u_max}
-\end{equation}
-
-Expanding, we have:
-
-\begin{equation}
-  G_{u,max} =  k_u  \frac{1- \phi_S - e^{-r'_u \xi} }{1  - \phi_S - e^{-r'_u \xi} + \phi_S  e^{-r'_u \xi}}
-\end{equation}
-
-
-Define $x$ as:
-
-\begin{equation}
-x = \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}}
-\end{equation}
-
-so $ G_{u,max} = k_u /(1+x)$:
-
-\begin{equation}
-G_{u,max}  = k_u \frac{1}{1 + \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}}}
-\end{equation}
-
-
-$G_{u,max} \sim k_u$ when $x$ is very small.
-Suppose we want $G_{u,max} = \gamma k_u$, where $\gamma$ is close to but less than 1.  Then:
-
-
-\begin{equation}
- k_u /(1+x) = \gamma k_u
-\end{equation}
-
-Rewriting as  $x = 1/\gamma  - 1= C$ (where $C> 0$):
-
-\begin{equation}
- \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}} =  1/\gamma  - 1 = C
-\end{equation}
-
-\begin{equation}
-{ \phi_S  e^{-r'_u \xi}} = C ({1- \phi_S - e^{-r'_u \xi}} )
-\end{equation}
-
-Rearranging gives:
-
-\begin{equation}
- \phi_S   =  \frac{C(1 - e^{-r'_u \xi})}{C  - e^{-r'_u \xi}}
- \label{phi_S_RI}
- \end{equation}
-
-This is an expression for the severity $ \phi_S $ at which $G_u = \gamma k_u$.
-
-Rearranging, the expression for $\xi$ is:
-
-
-\begin{equation}
-\xi   =  \frac{1}{r'_u}\log \frac{C  +\phi_S } {C(1 - \phi_S)}
- \label{RI_phi_S}
- \end{equation}
-
-In the limit that  $G_u = k_u$, $C=0$.
- Equation \ref{phi_S_RI} yields $\phi_S = 0$,  and Equation \ref{RI_phi_S} yields $\xi \rightarrow \inf$.
- This is reassuring.
-
 
 
 
@@ -674,10 +620,77 @@ let  $r = r_l/r_u$ and $\phi =  \alpha k_u / S_\beta r_u$,
 if $r_l$ ranges from 0.25 to 2.5,  $r$ ranges from 1 to 10.
 
 
-\section{Code notes}
 
-\code{all\_params()} returns the default parameters, which are overwritten when the RCSR class is initialized. 
-The only was to change the RCSR parameters is to reinitialize!  
+
+\section{Time dependence}
+ \subsection{ $G_u$ approaches $k_u$  leading up to each fire. How close does it get?}
+
+The  pre-fire biomass is:
+
+\begin{equation}
+  G_{u,max} =  \frac{k_u }{1-\phi_S}   \frac{1- \phi_S - e^{-r'_u \xi} }{1 - e^{-r'_u \xi}}
+  \label{G_u_max}
+\end{equation}
+
+Expanding:
+
+\begin{equation}
+  G_{u,max} =  k_u  \frac{1- \phi_S - e^{-r'_u \xi} }{1  - \phi_S - e^{-r'_u \xi} + \phi_S  e^{-r'_u \xi}}
+\end{equation}
+
+
+Define $x$ as:
+
+\begin{equation}
+x = \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}}
+\end{equation}
+
+so $ G_{u,max} = k_u /(1+x)$:
+
+\begin{equation}
+G_{u,max}  = k_u \frac{1}{1 + \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}}}
+\end{equation}
+
+
+$G_{u,max} \sim k_u$ when $x$ is very small.
+Suppose $G_{u,max} = \gamma k_u$, where $\gamma$ is close to but less than one.  Then:
+
+
+\begin{equation}
+ k_u /(1+x) = \gamma k_u
+\end{equation}
+
+Rewriting as  $x = 1/\gamma  - 1= C$ (where $C> 0$):
+
+\begin{equation}
+ \frac{ \phi_S  e^{-r'_u \xi}}{1- \phi_S - e^{-r'_u \xi}} =  1/\gamma  - 1 = C
+\end{equation}
+
+\begin{equation}
+{ \phi_S  e^{-r'_u \xi}} = C ({1- \phi_S - e^{-r'_u \xi}} )
+\end{equation}
+
+Rearranging gives:
+
+\begin{equation}
+ \phi_S   =  \frac{C(1 - e^{-r'_u \xi})}{C  - e^{-r'_u \xi}}
+ \label{phi_S_RI}
+ \end{equation}
+
+This is an expression for the severity $ \phi_S $ at which $G_u = \gamma k_u$.
+
+Rearranging, the expression for $\xi$ is:
+
+
+\begin{equation}
+\xi   =  \frac{1}{r'_u}\log \frac{C  +\phi_S } {C(1 - \phi_S)}
+ \label{RI_phi_S}
+ \end{equation}
+
+In the limit that  $G_u = k_u$, $C=0$;
+ Equation \ref{phi_S_RI} yields $\phi_S = 0$,  and Equation \ref{RI_phi_S} yields $\xi \rightarrow \inf$.
+
+
 
 
 

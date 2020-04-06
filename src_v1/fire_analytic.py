@@ -1,16 +1,19 @@
-from fire_model import *
 """
 Stand alone functions only
 """  
+from fire_model import *
 
-##### Mean biomass, and biomass before/after fires ##### 
+
+"""
+1.  Mean biomass, and biomass before/after fires
+"""
 def G_prefire( r, k, RI, severity):
     """
-    Computes the biomass immediately after each fire,
+    Computes the biomass immediately before each fire,
     once the system is in dynamic equilibrium
     """
     x = r*RI
-    phi_R = 1 - severity # fraction of biomass remaining
+    phi_R = 1 - severity  # fraction of biomass remaining
 
     numer = phi_R - np.exp(-x)
     denom = 1 - np.exp(-x)
@@ -59,8 +62,13 @@ def mean_G_u( r_u,  k_u, S, beta, RI, severity):
 
 def fix_G_l(r_l, r_u, k_l,  k_u, S, beta, alpha, RI, severity, gamma):
     """
-    For lack of a better name, solves for mean(G_l) if we assume 
-    mean(G_u) = gamma(k_u)
+    Solves for mean(G_l) given the assumption:
+        mean(G_u) = gamma*k_u
+
+    Parameters:
+    ----------
+    gamma: float
+        defined as mean(G_u) = gamma*k_u
     """
     numer (alpha*k_u*gamma + (1-gamma)*r_u*S**beta)
     denom = (r_l*S**beta)
@@ -69,10 +77,9 @@ def fix_G_l(r_l, r_u, k_l,  k_u, S, beta, alpha, RI, severity, gamma):
                
 
 """
-Stability functions!
+2. Stability functions
 """
-
-def min_RI_u(r_u,S, beta, severity):
+def min_RI_u(r_u, S, beta, severity):
     """
     For the system's growth rate and severity, 
     find the minimuim return interval for which G_u>0
@@ -81,6 +88,13 @@ def min_RI_u(r_u,S, beta, severity):
     severity = severity
 
     return -1./r_up*np.log(1-severity)
+
+def max_severity_u( r_u, RI):
+    """
+    For a given growth rate and return interval, 
+    find the maximum severity for which G > 0.
+    """
+    return 1 - np.exp(-r_u*RI)
 
 def max_RI_l(r_l, r_u, k_u, S, beta, alpha, RI, severity):
 	"""
@@ -93,21 +107,15 @@ def max_RI_l(r_l, r_u, k_u, S, beta, alpha, RI, severity):
 
 def min_RI_l(r_l, S, beta, severity):
     """
-    Bounds the minimum return time for which G_l >0
+    Bounds the minimum return time for which G_l > 0
     """
     r = r_l*S**beta
     return -1./r*np.log(1-severity)
 
 
-def max_severity_u( r_u, RI):
-    """
-    For a given growth rate and return interval, 
-    find the maximum severity for which G > 0.
-    """
-    return 1 - np.exp(-r_u*RI)
 
 """
-Estimates related to G_l in equilibrium with G_max
+3. Estimates related to G_l in equilibrium with G_max
 """
 def max_severity_l(r_l, r_u, k_u, S, beta, alpha, RI):
     """
@@ -115,12 +123,11 @@ def max_severity_l(r_l, r_u, k_u, S, beta, alpha, RI):
     severity must be less than the returned value 
     to sustain lower canopy biomass
 
-	# BUG? CONFUSED!
+	# BUG? may not work?
     """
     numer = alpha*k_u*np.exp(-r_u*S**beta*RI)
     denom = alpha*k_u - r_l*S**beta*(1 - np.exp(-r_u*S**beta*RI))
     return 1 - numer/denom
-
 
 
 def G_l_equil(r_l, r_u, k_l,  k_u, S, beta, alpha, RI, severity):
@@ -140,12 +147,15 @@ def G_l_equil(r_l, r_u, k_l,  k_u, S, beta, alpha, RI, severity):
     
     return greater_than_zero(G_l_eq)
 
+"""
+4. Utilities
+"""
 
 def greater_than_zero(G_o):
     """
-    set all values smaller than zero to zero
+    Set all values smaller than zero to zero
     
-    compatible with floats, arrays and lists...  
+    Compatible with floats, arrays and lists...  
 
     """
     if np.size(G_o) == 1:

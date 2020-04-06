@@ -1,7 +1,11 @@
+`all_params()` returns the default parameters, which are overwritten when the RCSR class is initialized.
+The only was to change the RCSR parameters is to reinitialize!  
+
+
+
 
 ###  Next steps
 
- -  Version control the fire code
 
 - document variable names and units
   - consider all variables that should be saved; those that can be removed.
