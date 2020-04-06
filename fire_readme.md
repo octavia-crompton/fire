@@ -6,12 +6,9 @@ The only was to change the RCSR parameters is to reinitialize!
 
 ###  Next steps
 
+- Sort out : {Lower canopy equilibrium}
+- Need to be able to call fire from the command line
 
-- document variable names and units
-  - consider all variables that should be saved; those that can be removed.
-  - folders:
-  - src_v1
-  - code_v1
 
 
 - write a script to call multiple runs.  call it:

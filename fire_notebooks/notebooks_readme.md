@@ -12,8 +12,8 @@
 - Similar test of the analytical solution over a  grid of parameters, but with random ignition and severity.
 - Saved to `random_RI_phi.pkl`
 
-`CRUR_analytic-dS` :
-- Explore sensitivity to varying soil moisture, growth-limiting factor, etc.
+`analytic-dS` :
+- Assess sensitivity to varying soil moisture, growth-limiting factor, etc.
 
 `CRUR_analytic-G_L_ignition` :
 - Explore potential feedbacks between G_l and ignition probability.

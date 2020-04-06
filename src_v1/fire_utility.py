@@ -9,12 +9,13 @@ class param_class:
 
 def print_limits(p):
     """
-    Predict the max severity and min frequency to sustain biomass in 
-    the upper canopy
+    Predict the max severity and min frequency to sustain biomass 
+    in the upper canopy
     """
 
     print ("The minimum return interval with severity = {0:.3f} is {1:.2f} years".format(p.severity,p.min_RI_u()))
-    print ("The maximum severity with RI = {0} years is {1:.4f}".format(p.RI, p.max_severity_u()))    
+    print ("The maximum severity with RI = {0} years is {1:.4f}".format(
+        p.RI, p.max_severity_u()))    
 
 def print_dict(d):
     # attrs = vars(self)

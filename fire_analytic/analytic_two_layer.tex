@@ -203,11 +203,11 @@ Substitute Equation  \ref{G_uo} and simplify:
 	For lower growth rates, a longer return interval is needed to sustain biomass.  Increasing $\beta$ and/or decreasing $S$  lowers the effective upper canopy growth rate
 	
 
-% Notebook: stability
+% Notebook: Stability
 \begin{figure}[h]
  \centering
   \includegraphics[width=33pc]{../fire_plots/stability_min_RI.png}
- \caption{ As $\beta$ increases / $S$ decreases, the effective growth rate $r'_u$ decreases, and so the minimum RI to sustain biomass increases }
+ \caption{ As $\beta$ increases (left) or $S$ decreases (right), the effective growth rate $r'_u$ decreases, and so the minimum $RI$ to sustain biomass increases. }
  \label{fig:stability_min_RI.png}
  \end{figure}
  
@@ -298,12 +298,10 @@ Figure \ref{fig:G_l_stability_v_alpha} shows example stability curves for $\hat 
  \end{figure}
    
 
-The lower canopy stability is sensitive to $r_l$. As lower canopy growth rate decreases, so does the range of values for which $\hat G_l > 0$ (see Figure \ref{fig:G_l_stability_v_rl}).
-
  \begin{figure}[h]
  \centering
 \includegraphics[width=20pc]{../fire_plots/G_l_stability_v_rl}
- \caption{ }
+ \caption{ The lower canopy stability is sensitive to $r_l$. As lower canopy growth rate decreases, so does the range of values for which $\hat G_l > 0$,}
  \label{fig:G_l_stability_v_rl}
  \end{figure}
   
@@ -374,6 +372,7 @@ The effective return time will be: $\xi' = \frac{\xi} { 1- S}$, and the equation
 \section{Soil moisture}
 
 \subsection{How does biomass change with decreasing soil moisture?}
+% Code: see analytic_dS 	
 
     The derivative of $\hat G_u$ with respect to soil moisture is:
     
@@ -409,11 +408,10 @@ The effective return time will be: $\xi' = \frac{\xi} { 1- S}$, and the equation
     Z = \frac{\log({1-\phi_S})}{\xi}
     \end{equation}
     
-     $\frac{d \hat{G}_l}{dS}$  has a minimum value where
+     $ \hat{G}_l$  has a minimum value where:
     
       \begin{equation}
-      \big( {r_u} S^{\beta }(\alpha  {k_u}  - Z) +2 Z \alpha  {k_u}
-       \big) = 0
+      \big( {r_u} S^{\beta }(\alpha  {k_u}  - Z) +2 Z \alpha  {k_u} \big) = 0
     \end{equation}
     
     Rearranging:
@@ -428,7 +426,7 @@ The effective return time will be: $\xi' = \frac{\xi} { 1- S}$, and the equation
      S^{\beta } = \frac{-2 {\log({1-\phi_S})} \alpha  {k_u} }{{r_u}(\alpha  {k_u} \xi - {\log({1-\phi_S})})  }
     \end{equation}
     
-    The numerator and denominator are both always positive (because $- \log(1-\phi_S) > 0$), so we expect a minima in $\hat G_l$ for $\alpha > 0$.
+    The numerator and denominator are both always positive (because $\log(1-\phi_S) < 0$), so we expect a minima in $\hat G_l$ for $\alpha > 0$.
     
      $\frac{d \hat{G}_l}{dS}$ has a discontinuity at  $ S = \big( - \frac{1}{r_l \xi }\log (1 - \phi_S)\big)^{1/\beta}$, where $G_l$ has a maximum value.
     

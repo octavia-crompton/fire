@@ -686,7 +686,7 @@ def all_params(update = {}):
     """
     params =  {
         "alpha" : 0.05,
-        "beta" : 1,
+        "beta" : 0.5,
         "k_u" : 20.,
         "k_l" : 5.,    
         "r_u" : 0.25,
