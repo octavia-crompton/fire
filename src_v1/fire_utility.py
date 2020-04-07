@@ -1,3 +1,6 @@
+from fire_model import *
+import pickle
+
 class param_class:
     """    
     """
@@ -35,3 +38,40 @@ def dictionary_diff(a, b):
     value = { k : difference(a[k], b[k])  for k in set(a) 
         if a[k] != b[k]}
     return value
+
+
+def test_for_overlap(list1, list2):
+    if list(set(list1) & set(list2)):
+        print( 'overlapping vars!\n',  list(set(list1) & set(list2)))
+    return  
+
+
+## Saving and loading fire sims
+def save_object(obj, filename):
+    """
+    Save object to pickle file
+
+    Parameters:
+    -----------
+    obj : oject
+        i.e. List of RCSR
+
+    Sample usage:
+        save_object(p, 'p.pkl')
+    """
+    with open(filename, 'wb') as output:  # Overwrites any existing file.
+        pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+
+
+def load_object( filename):
+    """
+    Sample usage:
+        d = load_object('p.pkl')
+    """
+    with open(filename, 'rb') as input:
+        obj = pickle.load(input)
+    return obj
+
+
+
+             

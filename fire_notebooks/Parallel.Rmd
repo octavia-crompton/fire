@@ -71,7 +71,9 @@ plt.legend()
 canopy_plot(p, nfire = 10)
 ```
 
-
+- need identifying keys / features 
+- analogue to parameter dictionary?
+    - make batches? 
 
 ```{python}
 

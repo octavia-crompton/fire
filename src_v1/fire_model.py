@@ -6,7 +6,6 @@ import itertools
 import multiprocessing as mp
 import copy
 import math
-from statsmodels.graphics.tsaplots import plot_acf
 import scipy
 from fire_analytic import *
 
@@ -19,7 +18,7 @@ class RCSR:
     def __init__(self, params = {}):
         """
         """
-        params = all_params(params)
+        params = default_params(params)
 
         for k, v in params.items():
              setattr(self, k, v)
@@ -82,7 +81,7 @@ class RCSR:
         Extract parameter dictionary from class object
         """
         extract_params = {}
-        for k in list(all_params().keys()):
+        for k in list(default_params().keys()):
             extract_params[k] =  vars(self)[k]
         return extract_params
 
@@ -266,9 +265,9 @@ class RCSR:
             self.compute_statistics()
 
         self.G_u_mean_list = np.cumsum(self.G_u_list)/(
-            np.arange(len(self.G_u_list)))
+            np.arange(1, len(self.G_u_list)+1))
         self.G_l_mean_list = np.cumsum(self.G_l_list)/(
-            np.arange(len(self.G_l_list)))            
+            np.arange(1, len(self.G_l_list)+1))            
 
 
     def compute_statistics(self):
@@ -676,7 +675,7 @@ class RCSR:
 
 
 
-def all_params(update = {}):
+def default_params(update = {}):
     """
     Contains default parameters values, which the dictionary 
     `update` will overwrite.
@@ -983,6 +982,6 @@ def diff_from_default(params):
     """
     Compares a parameter dictionary 
     """
-    value = { k : difference(params[k], all_params()[k])  for k in set(params) 
-        if params[k] != all_params()[k]}
+    value = { k : difference(params[k], default_params()[k])  for k in set(params) 
+        if params[k] != default_params()[k]}
     return value

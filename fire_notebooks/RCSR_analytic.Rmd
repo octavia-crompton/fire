@@ -1,0 +1,323 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.4.1
+  kernelspec:
+    display_name: fire3
+    language: python
+    name: fire3
+---
+
+Code to test the analytical solution with constant RI and severity;
+specifically, in a grid of severities, RIs, alphas and r_ls.
+
+```{python}
+import os
+startup_file = "/Users/octavia/Dropbox/fire/src_v1/startup.py"
+```
+
+```{python}
+run "/Users/octavia/Dropbox/fire/src_v1/startup.py"
+```
+
+## Strategy for saving multiple runs.
+
+```{python}
+# Simulation batch
+
+sim_dir = project_dir + "/factorial"
+sys.path.append(sim_dir)
+if "params" in sys.modules:
+    del sys.modules["params"]
+from params import all_params
+```
+
+```{python}
+batch_dict = all_params['batch_dict']
+sim_dict = all_params['sim_dict']
+common_dict = all_params['common_dict'] 
+```
+
+```{python}
+batch_vars = sorted(batch_dict)
+sim_vars = sorted(sim_dict)  
+common_vars = sorted(common_dict)
+```
+
+```{python}
+common_dict
+```
+
+```{python}
+test_for_overlap(sim_vars, common_vars)
+test_for_overlap(batch_vars, common_vars)
+test_for_overlap(batch_vars, sim_vars)
+
+```
+
+```{python}
+import itertools as it
+batch_combos = [dict(zip(batch_vars, prod))  for prod in \
+          it.product(*(batch_dict[var_name] for var_name in batch_vars))]
+sim_combos = [dict(zip(sim_vars, prod)) for prod in \
+           it.product(*(sim_dict[var_name] for var_name in sim_vars))]
+```
+
+```{python}
+        
+def run_RCSR(update):
+         
+    params = default_params()
+    params.update(update)
+    
+    p = RCSR(params)
+    p.run()
+    return p
+
+```
+
+```{python}
+from multiprocessing import Pool
+
+all_sims = []
+for bdict in batch_combos:    
+    batch_name = ','.join(['-'.join([key, str(bdict[key]) ] ) 
+        for key in bdict.keys()])  
+          
+    
+    param_list = []
+    
+    for sdict in sim_combos:  
+
+        params = common_dict.copy()
+        params.update(bdict)      
+        sim_name = ','.join(['-'.join([key, str(sdict[key]) ] )  for key in sdict.keys()])
+        
+        params.update(sdict)
+        params["batch_name"] = batch_name
+        params["sim_name"] = sim_name
+        params["key"] = ",".join([p.batch_name, p.sim_name]) 
+        param_list.append(params)
+    
+    
+    pool = Pool(processes=8)              
+    result =  (pool.map(run_RCSR, param_list )  )       
+    
+    pool.close()
+    
+    [all_sims.append(p) for p in result]
+
+
+```
+
+```{python}
+df = pd.DataFrame(all_sims, index = [p.key for p in all_sims ], columns=["p"])
+```
+
+```{python}
+save_object(all_sims, 'all_sims.pkl')
+```
+
+```{python}
+df.to_pickle("test.pkl")
+```
+
+```{python}
+res = pd.DataFrame()
+
+
+sim_dict = {"severities" : }
+severities = np.arange(0.1, 1., 0.1)
+RIs = np.arange(5, 65, 5)
+
+r_ls = [0.5, 1.0, 1.5]     
+alphas = [0.02, 0.04, 0.06, 0.08, 0.1]  
+
+
+for key in all_sims.index:
+    p = 
+
+        df, dfl = compute_errors(p)
+        update.update(np.abs(dfl))
+
+        res = res.append(update, ignore_index = True)
+res.to_pickle("./result.pkl")
+
+```
+
+```{python}
+res = pd.DataFrame()
+
+sim_dict = {"severities" : }
+severities = np.arange(0.1, 1., 0.1)
+RIs = np.arange(5, 65, 5)
+
+r_ls = [0.5, 1.0, 1.5]     
+alphas = [0.02, 0.04, 0.06, 0.08, 0.1]  
+
+
+
+for j, severity in enumerate(severities):
+    for i, freq in enumerate(RIs):
+       
+        for k, r_l in enumerate(r_ls):
+            for l, alpha in enumerate(alphas):
+
+                update = {
+                          "alpha" : alpha,
+                          "r_l" : r_l,
+                          "beta" : 0.5,
+                          "ti" : 2000, 
+                          "RI" : freq,
+                          "tmax" : 1000,
+                          "severity" : severity,
+                          "dt" : 0.01,
+                          "dt_p" : 0.1,
+                         }            
+                      
+                p = RCSR(update)  
+                p.run()
+                            
+
+                df, dfl = compute_errors(p)
+                update.update(np.abs(dfl))
+
+                res = res.append(update, ignore_index = True)
+res.to_pickle("./result.pkl")
+
+```
+
+```{python}
+
+```
+
+```{python}
+res = pd.DataFrame()
+
+severities = np.arange(0.1, 1., 0.1)
+RIs = np.arange(5, 65, 5)
+
+r_ls = [0.5, 1.0, 1.5]     
+alphas = [0.02, 0.04, 0.06, 0.08, 0.1]  
+
+for j, severity in enumerate(severities):
+    for i, freq in enumerate(RIs):
+       
+        for k, r_l in enumerate(r_ls):
+            for l, alpha in enumerate(alphas):
+
+                update = {
+                          "alpha" : alpha,
+                          "r_l" : r_l,
+                          "beta" : 0.5,
+                          "ti" : 2000, 
+                          "RI" : freq,
+                          "tmax" : 1000,
+                          "severity" : severity,
+                          "dt" : 0.01,
+                          "dt_p" : 0.1,
+                         }            
+                      
+                p = RCSR(update)  
+                p.run()
+                            
+
+                df, dfl = compute_errors(p)
+                update.update(np.abs(dfl))
+
+                res = res.append(update, ignore_index = True)
+res.to_pickle("./result.pkl")
+
+```
+
+```{python}
+res = pd.read_pickle("./result.pkl")
+```
+
+```{python}
+subset = res[(res.alpha==0.02)&(res.r_l == .5)]
+x_var = "RI"
+y_var = "severity"
+axes = plot_G_grid(subset, x_var, y_var)
+
+RIs = np.unique(subset.RI)
+p = RCSR(subset.iloc[0])
+severities = p.max_severity(p.r_u*p.S**p.beta, RIs)
+axes[0, 0].plot(RIs, severities, '--' )
+axes[1, 0].plot(RIs, severities, '--' )
+
+```
+
+```{python}
+## The errors are all acceptable
+x = res["G_l_mean_e"]
+cols = ["r_l", "alpha", "severity", "RI", "G_l_mean_a", "G_l_mean_c", "G_l_mean_e" ]
+res[x == np.max(x)][cols]
+```
+
+## Check out a high error case
+
+```{python}
+
+p = RCSR()
+update = {"soil_feedback" : "C",
+          "r_l" : 0.5,
+          "r_u" : 0.25,
+          "k_l" : 5.,
+          "k_u" : 20,
+          "alpha" : 0.1,
+          "beta" : 0.5,
+          "ti" : 2000, 
+          "tmax" : 1000,
+          "RI" : 20,
+          "severity" : 0.9,
+          "dt" : 0.01,
+          "dt_p" : 0.01          
+         }
+
+p = RCSR(update)
+p.run()
+
+
+print ("The minimum return interval with severity = {0} is {1:.2f} years".format(p.severity,p.min_RI_u()))
+print ("The maximum severity with RI = {0} years is {1:.4f}".format(p.RI, p.max_severity_u()))
+
+
+```
+
+```{python}
+canopy_plot(p, 10)
+```
+
+```{python}
+compute_errors(p)[0]
+```
+
+```{python}
+subset = res[(res.alpha==0.04)&(res.r_l == .5)]
+fig, axes = plt.subplots(1,2, figsize = (12, 4), sharey= True)
+
+
+ax = axes[0]
+d = ax.scatter(subset.RI, np.abs(subset.G_u_mean_e), 
+        c = subset.severity, cmap = "Blues")
+plt.colorbar(d, ax = ax)
+
+
+ax.set_xlabel("frequency")
+ax.set_title(r"$\bar G_u$ error")
+ax.set_ylabel("severity")
+
+ax = axes[1]
+d = ax.scatter(subset.RI, np.abs(subset.G_l_mean_e), 
+        c = subset.severity, cmap = "Blues")
+plt.colorbar(d, ax = ax)
+ax.set_xlabel("frequency")
+ax.set_title(r"$\bar G_l$ error")
+
+
+```

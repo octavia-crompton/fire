@@ -17,33 +17,6 @@ jupyter:
 ```
 
 ```{python}
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import pandas as pd
-# # %matplotlib inline
-# import sys
-# import time
-# import itertools
-# import multiprocessing as mp
-# import copy
-# import math
-# from statsmodels.graphics.tsaplots import plot_acf
-
-# sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
-
-# mymodules = ['plot_config', "fire_model", "fire_plot", "fire_analytic" ]
-
-# for mod in mymodules:
-#     if mod in sys.modules:
-#         del sys.modules[mod]
-
-# from plot_config import *
-# from fire_model import *
-# from fire_analytic import *
-# from fire_plot import *
-```
-
-```{python}
 import os
 startup_file = "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 ```
@@ -52,23 +25,21 @@ startup_file = "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 run "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 ```
 
-```{python}
-
-```
-
 ## The $G_l$-fire feedback
+
+ Assume that return time linearly decreases as G_l increases
 
 ```{python}
 fig, axes = plt.subplots(1,2, figsize = (10,4))
 ax = axes[0]
 
-# Assume that return time linearly decreases as G_l increases
 G_l = np.arange(0, p.k_l+.1 , 0.1)
 RI_l = p.RI + p.chi*p.RI - p.chi*p.RI/p.k_l*G_l
 ax.axhline(p.RI, c = "k", lw = 1)
 ax.plot(G_l, RI_l)
 ax.set_xlabel("$G_l$")
-ax.set_ylabel("RI")
+ax.set_ylabel("RI (years)")
+ax.set_title("RI (years)")
 
 print(p.chi)
 ax = axes[1]

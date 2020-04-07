@@ -1,4 +1,4 @@
-`all_params()` returns the default parameters, which are overwritten when the RCSR class is initialized.
+`default_params()` returns the default parameters, which are overwritten when the RCSR class is initialized.
 The only was to change the RCSR parameters is to reinitialize!  
 
 

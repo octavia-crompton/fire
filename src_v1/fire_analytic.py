@@ -3,7 +3,6 @@ Stand alone functions only
 """  
 from fire_model import *
 
-
 """
 1.  Mean biomass, and biomass before/after fires
 """

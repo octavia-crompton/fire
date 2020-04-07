@@ -12,6 +12,10 @@ jupyter:
     name: fire
 ---
 
+```{python}
+# %autosave 0
+```
+
 ### Explore sensitivity to varying soil moisture, growth-limiting factor, etc.
 
 ```{python}
@@ -25,7 +29,7 @@ run '/Users/octavia/Dropbox/fire/src_v1/startup.py'
 ```
 
 ```{python}
-params = all_params()
+params = default_params()
 params.update({ "severity" : 0.7})
 p = RCSR(params)
 
@@ -138,7 +142,7 @@ def dG_l_dS(r_l, r_u, k_l,  k_u, S, beta, alpha, RI, severity):
 ```
 
 ```{python}
-params = all_params()
+params = default_params()
 params.update({ "severity" : 0.5, "beta" : 0.5, "RI" : 10})
 p = RCSR(params)
 
@@ -177,3 +181,7 @@ for beta in [1]:
 ```
 
 
+
+```{python}
+
+```
