@@ -12,6 +12,10 @@ jupyter:
     name: fire
 ---
 
+```{python}
+# %autosave 0
+```
+
 ###  Illustrative notebook showing a single parameter case
 
 ```{python}

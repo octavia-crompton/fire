@@ -1,43 +1,34 @@
+"""
+ Run the RCSR model for the parameter file located in `name`
+
+"""
+
+name = "sims_factorial"
 
 import sys
-
-
-mymodules = ['plot_config', "fire_model", "fire_utility", "filepaths",
-             "fire_plot", "fire_analytic" ]
-
-for mod in mymodules:
-    if mod in sys.modules:
-        del sys.modules[mod]
-
-
-from plot_config import *
-from fire_model import *
-from fire_analytic import *
-from fire_utility import *
-from fire_plot import *
+import os
 from filepaths import *
+from fire_utility import *
+
+sim_dir = project_dir + "/" + name
+sys.path.append(sim_dir)
+
+if "params" in sys.modules:
+    del sys.modules["params"]
+
+from params import all_params
 
 
-p = RCSR()
-update = {
-          "r_l" : 0.45,
-          "r_u" : 0.15,           
-          "alpha" : 0.02,
-          "beta" : 0.5,
-          "ti" : 1000, 
-          "tmax" : 1000,
-          "RI" : 20,
-          "severity" : 0.80,
-          "dt" : 0.01,
-          "dt_p" : 0.1,
-          "severity_type" : "random",
-          "ignition_type" : "G_l",          
-          "sigma_phi" : 0.01,
-          "seed" : 0,
-          "chi" : 1,
-          "S" : 0.5
-         }
+def main(argv):
+	"""
+	"""
+	file_dir = sim_dir + "/all_sims"
+	if os.path.isdir(file_dir)  == False:
+	    os.mkdir(file_dir)
 
+	
+	all_sims = run_all_sims(all_params, file_dir)
+	
 
-p = RCSR(update)
-p.run()
+if __name__ == '__main__':
+    main(sys.argv)

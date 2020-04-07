@@ -1,5 +1,7 @@
 """
-Stand alone functions only
+1-3. Stand alone functions only
+ 4. Utilities
+ 5. Functions that require an RCSR instance
 """  
 from fire_model import *
 
@@ -161,4 +163,19 @@ def greater_than_zero(G_o):
         G_o = max(G_o, 0)
     else:
         G_o[G_o<0]= 0
-    return G_o       
+    return G_o    
+
+
+
+"""
+5. Functions that take an RCSR instance
+"""
+def print_limits(p):
+    """
+    Predict the max severity and min frequency to sustain biomass 
+    in the upper canopy
+    """
+
+    print ("The minimum return interval with severity = {0:.3f} is {1:.2f} years".format(p.severity,p.min_RI_u()))
+    print ("The maximum severity with RI = {0} years is {1:.4f}".format(
+        p.RI, p.max_severity_u()))      

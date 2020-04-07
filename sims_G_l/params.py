@@ -6,7 +6,8 @@ all_params = {
         "alpha" :  [0.02, 0.04]
         },
       "sim_dict" : {        
-        "RI" : np.arange(10, 100, 10)        
+        "RI" : np.arange(10, 100, 10),
+        "severity" : np.arange(0.1, 1, 0.1)        
         },
       "common_dict" : {                      
             "k_u" : 20.0,
@@ -17,12 +18,11 @@ all_params = {
             "dt" : 0.01,
             "dt_p" : 0.1,            
             "seed" : 0,
-            "ti" : 100,        
-            "tmax" : 100,      
-            "ignition_type" : "fixed",   
+            "ti" : 3000,        
+            "tmax" : 1000,      
+            "ignition_type" : "G_l",   
             "chi" : 1,                           
-            "severity_type" : "fixed",
-            "severity" : 0.5,
+            "severity_type" : "random",
             "std_severity" : 0.1,
             "r" : 0.5, 
             "a" : 0.01,

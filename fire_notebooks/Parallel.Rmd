@@ -38,8 +38,8 @@ def f(update):
     param = all_params()
     param.update({
               "ti" : 10000, 
-              "tmax" : 1000,
-              "RI" : 29,
+              "tmax" : 10000,
+              "RI" : 20,
               "severity" : 0.7,
               "severity_type" : "random",
               "ignition_type" : "random"
@@ -70,10 +70,6 @@ plt.legend()
 ```{python}
 canopy_plot(p, nfire = 10)
 ```
-
-- need identifying keys / features 
-- analogue to parameter dictionary?
-    - make batches? 
 
 ```{python}
 

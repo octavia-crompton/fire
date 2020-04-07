@@ -611,60 +611,60 @@ In the limit that  $G_u = k_u$, $C=0$;
 
 
 
-%  \subsection*{Lower canopy equilibrium}
-%
-%As an alternative approach, what if the lower canopy is in dynamic equilibrium with the upper canopy?
-%
-%The lower canopy biomass is constant ($\frac{d G_l}{dt}  = 0$) if:
-%
-%\begin{equation}
-% r_l S^\beta G_l \bigg(1-\frac{G_l}{k_l}\bigg) = \alpha G_{u,max} G_l
-%\end{equation}
-%
-%
-%Solving for $G_l$:
-%
-%\begin{equation}
-%G_{l,eq}   = k_l\bigg(1 - \frac{ \alpha G_{u,max} }{ r_l S^\beta}\bigg)
-%\label{G_l_eq}
-%\end{equation}
-%
-%where $G_{l,eq} $ denotes the equilibrium value for $G_{l} $.
-%
-%From Equation \ref{G_uo}:
-%
-%\begin{equation}
-%  G_{u,max} = \frac{ k_u}{(1-\phi_S)} \   \frac{1- \phi_S - e^{-r'_u \xi} }{1 - e^{-r'_u \xi}}
-%\end{equation}
-%
-%Substituting, the equation is messy:
-%
-%\begin{equation}
-%G_{l,eq}   = k_l\bigg(1 - \frac{ \alpha  k_u }{ r_l S^\beta}   \frac{(1- \phi_S - e^{-r'_u \xi}) }{(1-\phi_S)(1 - e^{-r'_u \xi)}}   \bigg)
-%\end{equation}
-%
-%If $G_{l,eq}> 0 $, we expect the lower canopy biomass to approach this value in advance of each fire.
-%However, if $G_{l,eq}= 0 $, lower canopy biomass may still be present because the system is out of equilibrium!
-%
-%Estimate a stability boundary as:
-%
-%
-%\begin{equation}
-%\frac{\alpha G_{u,max}}{r_l S^\beta} < 1
-%\end{equation}
-%
-%Substituting for $G_{u,max}$:
-%
-%\begin{equation}
-%\frac{\alpha }{r_l S^\beta} \frac{ k_u}{(1-\phi_S)} \   \frac{1- \phi_S - e^{-r'_u \xi} }{1 - e^{-r'_u \xi}} < 1
-%\end{equation}
-%
-%And solving for severity as a function for $\xi$:
-%
-%
-%\begin{equation}
-%\phi_S < 1 - \frac{\alpha k_u e^{-r'_u \xi }}{\alpha k_u - r_l S^\beta (1- e^{-r'_u \xi })}
-%\end{equation}
+  \subsection*{Lower canopy equilibrium}
+
+As an alternative approach, what if the lower canopy is in dynamic equilibrium with the upper canopy?
+
+The lower canopy biomass is constant ($\frac{d G_l}{dt}  = 0$) if:
+
+\begin{equation}
+ r_l S^\beta G_l \bigg(1-\frac{G_l}{k_l}\bigg) = \alpha G_{u,max} G_l
+\end{equation}
+
+
+Solving for $G_l$:
+
+\begin{equation}
+G_{l,eq}   = k_l\bigg(1 - \frac{ \alpha G_{u,max} }{ r_l S^\beta}\bigg)
+\label{G_l_eq}
+\end{equation}
+
+where $G_{l,eq} $ denotes the equilibrium value for $G_{l} $.
+
+From Equation \ref{G_uo}:
+
+\begin{equation}
+  G_{u,max} = \frac{ k_u}{(1-\phi_S)} \   \frac{1- \phi_S - e^{-r'_u \xi} }{1 - e^{-r'_u \xi}}
+\end{equation}
+
+Substituting, the equation is messy:
+
+\begin{equation}
+G_{l,eq}   = k_l\bigg(1 - \frac{ \alpha  k_u }{ r_l S^\beta}   \frac{(1- \phi_S - e^{-r'_u \xi}) }{(1-\phi_S)(1 - e^{-r'_u \xi)}}   \bigg)
+\end{equation}
+
+If $G_{l,eq}> 0 $, we expect the lower canopy biomass to approach this value in advance of each fire.
+However, if $G_{l,eq}= 0 $, lower canopy biomass may still be present because the system is out of equilibrium!
+
+Estimate a stability boundary as:
+
+
+\begin{equation}
+\frac{\alpha G_{u,max}}{r_l S^\beta} < 1
+\end{equation}
+
+Substituting for $G_{u,max}$:
+
+\begin{equation}
+\frac{\alpha }{r_l S^\beta} \frac{ k_u}{(1-\phi_S)} \   \frac{1- \phi_S - e^{-r'_u \xi} }{1 - e^{-r'_u \xi}} < 1
+\end{equation}
+
+And solving for severity as a function for $\xi$:
+
+
+\begin{equation}
+\phi_S < 1 - \frac{\alpha k_u e^{-r'_u \xi }}{\alpha k_u - r_l S^\beta (1- e^{-r'_u \xi })}
+\end{equation}
 
 
 

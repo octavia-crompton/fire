@@ -39,7 +39,7 @@ ax.axhline(p.RI, c = "k", lw = 1)
 ax.plot(G_l, RI_l)
 ax.set_xlabel("$G_l$")
 ax.set_ylabel("RI (years)")
-ax.set_title("RI (years)")
+ax.set_title("$RI = 1/p$(ignition) ")
 
 print(p.chi)
 ax = axes[1]
@@ -47,25 +47,41 @@ ax.plot(G_l, 1/RI_l)
 ax.axhline(1/p.RI, c = "k", lw = 1)
 ax.set_xlabel("$G_l$")
 ax.set_ylabel("$p$(ignition)")
+ax.set_title("$p$(ignition)")
 ```
 
 ## Simulation 
 
 ```{python}
+# Simulation batch
+sim_dir = project_dir + "/sims_G_l"
+file_dir = sim_dir + "/all_sims"
+if os.path.isdir(file_dir)  == False:
+    os.mkdir(file_dir)
+    
+sys.path.append(sim_dir)
+if "params" in sys.modules:
+    del sys.modules["params"]
+from params import all_params
+
+```
+
+```{python}
+all_sims = run_all_sims(all_params, file_dir)
+```
+
+```{python}
 p = RCSR()
+# params = default
 update = {
           "r_l" : 0.45,
           "r_u" : 0.15,           
           "alpha" : 0.02,
           "beta" : 0.5,
-          "ti" : 1000, 
-          "tmax" : 1000,
           "RI" : 20,
           "severity" : 0.80,
-          "dt" : 0.01,
-          "dt_p" : 0.1,
           "severity_type" : "random",
-          "ignition_type" : "G_l",          
+          "ignition_type" : "G_l,          
           "sigma_phi" : 0.01,
           "seed" : 0,
           "chi" : 1,
