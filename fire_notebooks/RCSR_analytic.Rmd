@@ -32,7 +32,7 @@ run "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 
 ```{python}
 # Simulation batch
-sim_dir = project_dir + "/sims_factorial"
+sim_dir = project_dir + "/sims_analytic_check"
 file_dir = sim_dir + "/all_sims"
 if os.path.isdir(file_dir)  == False:
     os.mkdir(file_dir)
@@ -45,12 +45,12 @@ from params import all_params
 ```
 
 ```{python}
-all_sims = run_all_sims(all_params, file_dir)
+# better to run from the command line as `call_fire.py`
+# all_sims = run_all_sims(all_params, file_dir)
 ```
 
 ```{python}
-# keys = os.listdir(file_dir)
-# all_sims2 = read_all_sims(file_dir)
+all_sims = read_all_sims(file_dir)
 ```
 
 ```{python}
@@ -65,6 +65,7 @@ res = pd.read_pickle(sim_dir + "/analytic_errs.pkl")
 subset = res[(res.alpha==0.02)&(res.r_l == 1.5) & (res.beta == 0.6)]
 x_var = "RI"
 y_var = "severity"
+subset = subset.sort_values(by = [x_var, y_var])
 axes = plot_G_grid(subset, x_var, y_var)
 
 RIs = np.unique(subset.RI)
@@ -75,6 +76,8 @@ axes[1, 0].plot(RIs, severities, '--' )
 
 ```
 
+## Check out a high error case
+
 ```{python}
 ## The errors are all acceptable
 x = res["G_l_mean_e"]
@@ -84,43 +87,12 @@ high_error_case[cols]
 high_error_case.index[0]
 ```
 
-## Check out a high error case
-
 ```{python}
 p = all_sims.loc[high_error_case.index[0]][0]
 ```
 
 ```{python}
 canopy_plot(p, 10)
-```
-
-```{python}
-compute_errors(p)[0]
-```
-
-```{python}
-subset = res[(res.alpha==0.04)&(res.r_l == .5)]
-fig, axes = plt.subplots(1,2, figsize = (12, 4), sharey= True)
-
-
-ax = axes[0]
-d = ax.scatter(subset.RI, np.abs(subset.G_u_mean_e), 
-        c = subset.severity, cmap = "Blues")
-plt.colorbar(d, ax = ax)
-
-
-ax.set_xlabel("frequency")
-ax.set_title(r"$\bar G_u$ error")
-ax.set_ylabel("severity")
-
-ax = axes[1]
-d = ax.scatter(subset.RI, np.abs(subset.G_l_mean_e), 
-        c = subset.severity, cmap = "Blues")
-plt.colorbar(d, ax = ax)
-ax.set_xlabel("frequency")
-ax.set_title(r"$\bar G_l$ error")
-
-
 ```
 
 ```{python}

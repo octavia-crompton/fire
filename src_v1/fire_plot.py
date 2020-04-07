@@ -7,7 +7,6 @@ import matplotlib.colors as colors
 import copy
 import math
 
-  
 """
 Plotting functions by `plot_output`
 """  

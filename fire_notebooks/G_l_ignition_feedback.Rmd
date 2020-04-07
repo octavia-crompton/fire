@@ -49,7 +49,8 @@ ax.axhline(1/p.RI, c = "k", lw = 1)
 ax.set_xlabel("$G_l$")
 ax.set_ylabel("$p$(ignition)")
 ax.set_title("$p$(ignition)")
-fig.savefig(figdir + '/G_l_feedback.png', format='png', dpi=300, bbox_inches = "tight")
+fig.savefig(fig_dir + '/G_l_feedback.png', format='png', dpi=300, bbox_inches = "tight")
+## Add to writeup
 ```
 
 ## Simulation 

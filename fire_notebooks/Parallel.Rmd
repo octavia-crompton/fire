@@ -42,7 +42,7 @@ def f(update):
               "RI" : 20,
               "severity" : 0.7,
               "severity_type" : "random",
-              "ignition_type" : "random"
+              "ignition_type" : "random",
          })
     param.update(update)
 
@@ -50,10 +50,10 @@ def f(update):
     p.run()
     return p
 
-pool = Pool(processes=8)              # start 4 worker processes
+pool = Pool(processes=8)             
 
 
-result =  (pool.map(f, updates)  )        # prints "[0, 1, 4,..., 81]"
+result =  (pool.map(f, updates)  )       
 pool.close()
 
 p = result[0]
