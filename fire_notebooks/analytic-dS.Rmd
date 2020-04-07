@@ -103,7 +103,7 @@ axes[0].set_xlabel("$S$")
 axes[1].set_xlabel("$S$")
 axes[0].set_ylabel("$\hat G_u$")
 axes[1].set_ylabel("$\hat G_l$")
-fig.savefig(figdir + '/stability.png', format='png', dpi=1000, bbox_inches = "tight")
+fig.savefig(fig_dir + '/stability.png', format='png', dpi=1000, bbox_inches = "tight")
 ```
 
 ### Check analytical expression $\partial G_l / \partial S$

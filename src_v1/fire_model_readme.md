@@ -1,3 +1,13 @@
+
+
+### Summary
+
+`default_params()` returns the default parameters, which are overwritten when the RCSR class is initialized.
+The only was to change the RCSR parameters is to reinitialize!  
+
+
+
+
 ### Parameters to initialize the fire model
 
  - `alpha` : competition
@@ -17,24 +27,28 @@
 
 #### Ignition
 
+Fire ignition is predicted on annual time steps, and
+biomass growth on smaller time steps.
+
+
  - `RI` : fire return interval (yr)
  - `ignition_type`: how fire ignition thresholds are specified
    - `series`, `random`, or `G_l`
  - `chi` : `G_l` ignition feedback parameter
 
-#### Severity
 
+#### Severity
+- `severity` : mean fire severity
+   - fraction of biomass removed by fire
  - `severity_type` :  type of fire severity
      - `fixed` or `random`
      - if `fixed`, lower and upper canopy severity is the same
- - `severity` : mean fire severity
-    - fraction of biomass removed by fire
+     - if  `random`, upper and lower fire severities are drawn from a bivariate normal distribution
  - `std_severity` : standard deviation of the sampled severity
     - applies to  `random` severity type
  - `a` , `b` : minimum and maximum severity
    - parameter in truncated gaussian
  - `r` : correlation between upper and lower canopy severity
-
 
 #### Initialized with defaults
 

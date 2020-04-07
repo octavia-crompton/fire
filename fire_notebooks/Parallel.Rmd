@@ -35,7 +35,7 @@ def f(update):
     
     p = RCSR()
     
-    param = all_params()
+    param = default_params()
     param.update({
               "ti" : 10000, 
               "tmax" : 10000,

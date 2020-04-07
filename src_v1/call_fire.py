@@ -3,7 +3,7 @@
 
 """
 
-name = "sims_factorial"
+name = "sims_analytic_check"
 
 import sys
 import os
