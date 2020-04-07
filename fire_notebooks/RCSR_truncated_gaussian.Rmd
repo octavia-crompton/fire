@@ -1,0 +1,189 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.4.1
+  kernelspec:
+    display_name: fire3
+    language: python
+    name: fire3
+---
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+# %matplotlib inline
+import sys
+import time
+import itertools
+import multiprocessing as mp
+import copy
+import math
+from statsmodels.graphics.tsaplots import plot_acf
+import scipy
+sys.path.append("/Users/octavia/Dropbox/fire/fire_code/" )
+
+mymodules = ['plot_config', "fire_model", "fire_plot", "fire_analytic" ]
+
+for mod in mymodules:
+    if mod in sys.modules:
+        del sys.modules[mod]
+
+
+from plot_config import *
+from fire_model import *
+from fire_analytic import *
+from fire_plot import *
+```
+
+## Are we sampling severity in a sensible way?
+
+```{python}
+
+severity = 0.1
+std_phi = 0.1
+
+x, y = severity_sampler(n = 1e5,severity = severity, std_phi = std_phi,
+                             r =0.5, seed = 0, include = True)
+b = plt.hist(y[:, 0], bins = 20, normed=False)
+b = plt.hist(x[:, 0], bins = b[1], normed=False, alpha = 0.5)
+
+```
+
+```{python}
+mean_truncated = predict_truncated_mean(severity, std_phi, 0, 1)
+std_truncated = predict_truncated_std(severity, std_phi, 0, 1)
+df = pd.DataFrame({
+              "original" : {
+                            "mean" : y[:, 0].mean(),
+                            "std" : y[:, 0].std()
+                           },
+              "truncated" : {
+                            "mean" : x[:, 0].mean(),
+                            "std" : x[:, 0].std()
+                           },
+              "predicted" : {
+                            "mean":  mean_truncated,
+                            "std":  std_truncated
+                  
+                           }
+             })
+df["difference"] = df["original"] - df["truncated"]
+# percent difference : how much the original and truncated differ
+df["p_diff"] = (df["original"] - df["truncated"])/ df["original"]*100
+# error : how much the original and truncated differ
+df["error"] = df["predicted"] - df["truncated"]
+# error : how much the original and truncated differ (percent)
+df["p_err"] = (df["predicted"] - df["truncated"])/ df["predicted"]*100
+# Note: we don't expect exact agreement, as we've done some correlated 
+# trimming on two axes!
+```
+
+```{python}
+df
+
+```
+
+```{python}
+fig, axes = plt.subplots(1, 2, figsize = (8,4))
+ax = axes[0]
+ax.hist(x[:,0], 20);
+ax.hist(x[:,1], 20);
+
+ax = axes[1]
+ax.scatter(x[:,0], x[:, 1],s = 1)
+ax.set_xlabel("lower canopy severity")
+ax.set_ylabel("upper canopy severity")
+```
+
+## Putting this into action
+
+```{python}
+update = {"soil_feedback" : "C",
+          "r_l" : 1.5,          
+          "r_u" : 0.25,
+          "S" : 0.5,
+          "alpha" : 0.04,
+          "beta" : 0.5,
+          "ti" : 1000, 
+          "tmax" : 100,
+          "RI" : 20,
+          "severity" : 0.8,
+          "dt" : 0.001,
+          "dt_p" : 0.001,
+          "seed" : 0
+         }
+
+p = RCSR()
+update.update({})
+p = RCSR(update)
+
+
+print ("The minimum return interval with severity = {0} is {1:.2f} years".format(p.severity,p.min_RI_u()))
+print ("The maximum severity with RI = {0} years is {1:.4f}\n".format(p.RI, p.max_severity_u()))
+
+print (r"Analytic  G_u = {0:.2f} ".format(p.mean_G_u()))
+print (r"Analytic  G_l = {0:.2f} ".format(p.mean_G_l()))
+
+```
+
+```{python}
+p.run()
+```
+
+```{python}
+canopy_plot(p, nfire = 10000)
+```
+
+```{python}
+p = RCSR()
+start = time.time()
+update .update({
+          "severity_type" : "random",
+          "ignition_type" : "random",          
+          "std_phi" : 0.05,
+          "ti" : 100000,
+          "tmax" : 100000,
+          "dt_p" : 0.01,
+          "dt" : 0.01,
+         })
+
+
+p = RCSR(update)
+p.run()
+runtime =  time.time()- start
+```
+
+```{python}
+fig, axes = plt.subplots(1, 2, figsize = (14,4) )
+axes[0].hist(p.record.time_past_fire, 20, normed=True);
+y = np.arange(2, 100)
+lambda_RI = 1/p.RI
+axes[0].plot(y, lambda_RI*np.exp(-lambda_RI*y), label = "RI pdf")
+axes[0].set_title("Histograph of RIs")
+axes[0].set_xlabel("RI")
+
+axes[1].hist(p.record.u_severity, 20, normed=True);
+axes[1].set_title("Histograph of severities")
+axes[1].set_xlabel("severity")
+```
+
+```{python}
+canopy_plot(p, nfire = 100)
+```
+
+```{python}
+compute_errors_mean(p)[0]
+```
+
+```{python}
+
+```
+
+```{python}
+
+```

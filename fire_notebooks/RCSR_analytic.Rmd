@@ -12,12 +12,11 @@ jupyter:
     name: fire3
 ---
 
+#### Code to test the analytical solution with constant RI and severity
+
 ```{python}
 # %autosave 0
 ```
-
-Code to test the analytical solution with constant RI and severity;
-specifically, in a grid of severities, RIs, alphas and r_ls.
 
 ```{python}
 import os
