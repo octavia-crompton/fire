@@ -20,7 +20,7 @@ all_params = {
             "dt_p" : 0.1, 
             "seed" : 0,
             "ti" : 5000, 
-            "tmax" : 3000,
+            "tmax" : 4000,
             "chi" : 1,
             "severity_type" : "random",
             "std_severity" : 0.1,

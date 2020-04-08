@@ -8,39 +8,43 @@
 
 ### Notebooks in `fire_notebooks`
 
-`analytic-dS` :
-- Assess sensitivity to varying soil moisture, growth-limiting factor, etc.
-
-- `Dimensionless`
-
-`Estimate_parameters` :
-- A notebook for estimating parameters for ICB and SLC
+- `analytic-dS.ipynb` :
+  - Assess sensitivity to varying soil moisture, growth-limiting factor, etc.
 
 
-`G_l_ignition_feedback` :
+- `Dimensionless.ipynb` :
+ - Does not exist yet; would like to do something with dimensionless groups.
+
+
+- `Estimate_parameters.ipynb` :
+  - A notebook for estimating parameters for ICB and SLC
+
+- `G_l_ignition_feedback.ipynb` :
 - Explore potential feedbacks between G_l and ignition probability.
 
 
-`Parallel.ipynb`
-- Illustrating how to run the RCSR model in parallel
-
-`RCSR_analytic.ipynb` :
-- Tests the analytical solution with constant RI and severity (no randomness)
+- `Parallel.ipynb`
+  - Illustrating how to run the RCSR model in parallel
 
 
-`RCSR_analytic_random.ipynb`
--  Test the analytical solution over a  grid of parameters, with random ignition and severity.
+- `RCSR_analytic.ipynb` :
+  - Tests the analytical solution with constant RI and severity (no randomness)
+
+
+- `RCSR_analytic_random.ipynb`
+  - Test the analytical solution over a  grid of parameters, with random ignition and severity.
  - Test whether _G\_u_ and _G\_l_ will eventually converge to the analytical approximate solutions.
 
-`RCSR_illustrate`:
--  Illustrative notebook showing a single parameter case.
+
+- `RCSR_illustrate.ipynb` :
+  - Illustrative notebook showing a single parameter case.
 
 
-- `RCSR_truncated_gaussian` :
+- `RCSR_truncated_gaussian.ipynb` :
    - Check that calculations of the truncated Gaussian moments are correct.
 
 
-- `Stability`
+- `Stability.ipynb` :
   - Visualizing analytic predictions about canopy stability
 
 
@@ -51,19 +55,27 @@ Version 1 of the RCSR model
 
 - `biome_params.py`
 
+
 - `call_fire.py`
+
 
 - `filepaths.py`
 
+
 - `fire_analytic.py`
 
-- `fire_model_readme.md`
 
 - `fire_model.py`
+  - Defines the RCSR class, plus code to compute errors and summaries
+
 
 - `fire_plot.py`
+  - Code to plot RCSR simulations
+
 
 - `fire_utility.py`
+  - helper functions
+
 
 - `plot_config.py`
 
