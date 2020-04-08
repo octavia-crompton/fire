@@ -190,7 +190,13 @@ def load_object( filename):
 
 
 
-             
+def print_all_params(all_params):
+    print ( 'batch vars:')
+    for key in all_params['batch_dict'].keys():
+        print( ' ', key, all_params['batch_dict'][key])
+    print ( 'sim vars:')
+    for key in all_params['sim_dict'].keys():
+        print (' ', key, all_params['sim_dict'][key] )
 """
 For viewing parameter files
 """ 

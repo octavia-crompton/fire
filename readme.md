@@ -1,12 +1,17 @@
 
-```
-```
-### List of notebooks
+# Contents
 
+- `fire_analytic`
+  - math writeup
+
+
+
+### Notebooks in `fire_notebooks`
 
 `analytic-dS` :
 - Assess sensitivity to varying soil moisture, growth-limiting factor, etc.
 
+- `Dimensionless`
 
 `Estimate_parameters` :
 - A notebook for estimating parameters for ICB and SLC
@@ -16,11 +21,14 @@
 - Explore potential feedbacks between G_l and ignition probability.
 
 
-`RCSR_analytic` :
+`Parallel.ipynb`
+- Illustrating how to run the RCSR model in parallel
+
+`RCSR_analytic.ipynb` :
 - Tests the analytical solution with constant RI and severity (no randomness)
 
 
-`RCSR_analytic-random`
+`RCSR_analytic_random.ipynb`
 -  Test the analytical solution over a  grid of parameters, with random ignition and severity.
  - Test whether _G\_u_ and _G\_l_ will eventually converge to the analytical approximate solutions.
 
@@ -28,17 +36,13 @@
 -  Illustrative notebook showing a single parameter case.
 
 
-`RCSR_truncated_gaussian` :
- - Check that calculations of the truncated Gaussian moments are correct.
+- `RCSR_truncated_gaussian` :
+   - Check that calculations of the truncated Gaussian moments are correct.
 
 
-`Stability`
-- Still a hodgepodge, including code to parallelize
+- `Stability`
+  - Visualizing analytic predictions about canopy stability
 
-
-### List of pkl files:
-
-`result.pkl` : test analytic solution for constant RI and severity
 
 
 ### src_v1 python code

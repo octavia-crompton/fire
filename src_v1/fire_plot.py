@@ -82,7 +82,7 @@ def canopy_compare(p_wf, p_nf, nfire = 1000, title = ""):
     ax.plot(p_wf.t_p[to:-1:int(1/p_nf.dt_p)], 
             p_wf.G_u_list[to:-1:int(1/p_nf.dt_p)], '--',
             label ="$G_l$ feedback")        
-    ax.set_ylabel("$G_u$ n")
+    ax.set_ylabel("$G_u$ ")
     ax.set_ylim(0,)
     ax.legend()
 

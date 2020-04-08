@@ -81,8 +81,7 @@ res.p = 1/res.RI
 ```
 
 ```{python}
-print(all_params["batch_dict"])
-print(all_params["sim_dict"])
+print_all_params(all_params)
 ```
 
 ### Select a simulation `p` from the $G_l$ feedback simulations;  subset `res` to match that case, grouping by no feedback ( `random`) and  $G_l$ feedback.
@@ -91,7 +90,12 @@ print(all_params["sim_dict"])
 res_random = res[res.ignition_type == "random"]
 res_feedback = res[res.ignition_type == "G_l"]
 
-case = res_feedback[res_feedback.alpha == 0.04].iloc[0]
+case = res[(res.ignition_type == "G_l") & 
+           (res_feedback.alpha == 0.06) & 
+           (res_feedback.severity == 0.8) & 
+           (res_feedback.RI == 30) & 
+           (res_feedback.S == 0.5) ].iloc[0]
+print (case.name)
 
 random_subset = res_random[(res_random.alpha==case.alpha) & (res_random.beta == case.beta)]
 feedback_subset = res_feedback[(res_feedback.alpha==case.alpha) & (res_feedback.beta == case.beta)]
@@ -126,7 +130,7 @@ match_case[["err", "err_u", "err_l"]]
 ```{python}
 title = "No feedback : " + print_dict(case[["severity","RI"]]) + "\n $G_l$ Feedback : " + \
             print_dict(match_case[["severity","RI"]]) 
-canopy_compare(p, p_match, nfire = 1000, title = title)
+canopy_compare(p, p_match, nfire = 100, title = title)
 # what is the "average" trajectory?
 ```
 
@@ -138,7 +142,6 @@ compare.where(compare.G_l_feedback != compare.no_feedback).dropna().round(2)
 ```
 
 ```{python}
-
 def format_axes(x_var, y_var, ax):
     
     label_dict = {
@@ -181,11 +184,69 @@ axes[0].legend()
 
 ```
 
-# Subset in different ways
+```{python}
+x_var = "RI"
+y_var = "severity"
+feedback_subset = feedback_subset.sort_values(by = [x_var, y_var])
+random_subset = random_subset.sort_values(by = [x_var, y_var])
+```
 
 ```{python}
-random_subset = res_random[(res_random.alpha==case.alpha) & (res_random.beta == case.beta)]
-feedback_subset = res_feedback[(res_feedback.alpha==case.alpha) & (res_feedback.beta == case.beta)]
+def plot_grid_feedback(feedback_subset, random_subset, x_var, y_var):
+    """
+    Gridded plot of G_u and G_l predicted mean and errors, 
+    over a 2D grid of parameter values (`x_var` and `y_var`)
+    
+    """
+
+
+    fig, axes = plt.subplots(2,2, figsize = (12, 8))
+    axes = axes.ravel()
+    maps = reformat_to_grid(feedback_subset,x_var, y_var)
+    y = expand(maps[y_var].copy())
+    x = expand(maps[x_var].copy())
+    
+    ax = axes[0]
+    z = expand_z(np.array(maps["G_u_mean"]))
+    ax.set_xticks([], []);    
+    ax, zplot = colormap(x,y, z, ax= ax)
+    ax.set_ylabel("Severity")
+    ax.set_title(r"$\bar G_u$ with feedback ")
+    
+    ax = axes[1]
+    z = expand_z(np.array(maps["G_l_mean"]))
+    ax, zplot = colormap(x,y, z, ax= ax)
+    ax.set_yticks([], []);
+    ax.set_xticks([], []);        
+    ax.set_title(r"$\bar G_l$ with feedback")
+
+    maps = reformat_to_grid(random_subset,x_var, y_var)
+    y = expand(maps[y_var].copy())
+    x = expand(maps[x_var].copy())    
+    
+    ax = axes[2]
+    z = expand_z(np.array(maps["G_u_mean"]))
+    ax.set_xticks([], []);    
+    ax, zplot = colormap(x,y, z, ax= ax)
+    ax.set_ylabel("Severity")
+    ax.set_title(r"$\bar G_u$ with feedback ")
+    
+    ax = axes[3]
+    z = expand_z(np.array(maps["G_l_mean"]))
+    ax, zplot = colormap(x,y, z, ax= ax)
+    ax.set_yticks([], []);
+    ax.set_xticks([], []);        
+    ax.set_title(r"$\bar G_l$ with feedback")
+    
+    
+    return axes
+```
+
+```{python}
+ plot_grid_feedback(feedback_subset, random_subset, x_var, y_var);
+```
+
+```{python}
 
 ```
 
