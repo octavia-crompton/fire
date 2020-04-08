@@ -34,7 +34,8 @@ class RCSR:
         self.cat_severity = 0
         self.t = 0
         self.RI = int(self.RI)
-        
+        self.severity = round(self.severity, 4)
+        self.p = 1/self.RI
         self.times = np.arange(0, self.tmax+self.ti +self.dt) 
         self.t_p = np.arange(self.ti, self.tmax + self.ti + self.dt_p, 
             self.dt_p)   
@@ -200,6 +201,12 @@ class RCSR:
     def G_l_ignite_threshold(self):
         """
         Ignition probability, prescribed as 1/RI
+    
+        Notes
+        -----
+        RI_l = RI + chi*RI - chi*RI/k_l*G_l
+        RI_l(G_l = k_l)  is RI, that is, the minimum RI is the prescribed RI
+
         """            
         RI_l = self.RI + self.chi*self.RI - \
             self.chi*self.RI/self.k_l*self.G_l
@@ -804,36 +811,8 @@ def predict_truncated_std(severity, std_severity, a, b):
     return std_severity*(1 + term1 - term2)**0.5
 
  ###########################################################################   
-def greater_than_zero(G_o):
-    """
-    set all values smaller than zero to zero
-    
-    compatible with floats, arrays and lists...  
-
-    """
-    if np.size(G_o) == 1:
-        G_o = max(G_o, 0)
-    else:
-        G_o[G_o<0]= 0
-    return G_o   
-
-def less_than_one(x):
-    """
-    Set all values smaller than zero to zero
-    
-    compatible with floats, arrays and lists...  
-
-    """
-    if np.size(x) == 1:
-        x = min(1, x)
-    else:
-        x[x>1]= 1
-    return x   
-
-
-def rmse(x,y):
-    return np.sqrt(np.mean((x-y)**2))
-
+ ############################ Post-processing ##############################
+ ###########################################################################   
 
 def compute_errors(p):
     """
@@ -963,11 +942,89 @@ def compute_errors_mean(p):
     return df, dfl    
 
 
-   
+def summary(p):
+    """
+    Summarize a simulation instance
+    """
+    RI = p.record.time_past_fire.mean()
+    RI_std = p.record.time_past_fire.std()
+
+    phi = p.record.u_severity.mean()
+    phi_std = p.record.u_severity.std()
+  
+    df = pd.Series({
+                    "G_u_mean" : p.G_u_list.mean(),
+                    "G_l_mean" : p.G_l_list.mean(),
+                    "RI_c" : RI,
+                    "severity_c" : phi,
+                    "RI_std_c" : RI_std,
+                    "severity_std_c" : phi_std,
+                    "p" : 1/p.RI
+                    })
+    
+    return df
+
+def compute_all_summary(all_sims, sim_dir):
+    """
+    Compute the errors for a list of RCSR instances, with
+    regular ignition and severities
+    
+    """
+    res = pd.DataFrame()
+
+    for key in all_sims.index:
+
+        p = all_sims.loc[key][0]
+
+        var_list = list(default_params().keys())
+        param = pd.Series(vars(p))[var_list]
+
+
+        df  = summary(p)
+            
+        df = df.append(param)
+
+        res = res.append(df, ignore_index = True)
+    res.index = all_sims.index
+
+    res.to_pickle(sim_dir + "/summary.pkl")
+    return res    
+
 
 ####################################################################
-######################## UTILITIES #################################
+######################## Utility #################################
 ####################################################################
+def greater_than_zero(G_o):
+    """
+    set all values smaller than zero to zero
+    
+    compatible with floats, arrays and lists...  
+
+    """
+    if np.size(G_o) == 1:
+        G_o = max(G_o, 0)
+    else:
+        G_o[G_o<0]= 0
+    return G_o   
+
+def less_than_one(x):
+    """
+    Set all values smaller than zero to zero
+    
+    compatible with floats, arrays and lists...  
+
+    """
+    if np.size(x) == 1:
+        x = min(1, x)
+    else:
+        x[x>1]= 1
+    return x   
+
+
+def rmse(x,y):
+    return np.sqrt(np.mean((x-y)**2))
+
+
 
 def difference(a, b):
     """

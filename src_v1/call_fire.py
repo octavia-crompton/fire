@@ -3,7 +3,7 @@
 
 """
 
-name = "sims_random_check"
+name = "sims_G_l"
 
 import sys
 import os

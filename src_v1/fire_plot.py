@@ -64,9 +64,12 @@ def canopy_compare(p_wf, p_nf, nfire = 1000, title = ""):
     """
     Plot comparison of two cases: with and without G_l feedback
 
+    Parameters
+    -----------
+
 
     """
-    fig, axes = plt.subplots(2, 1, figsize = (14,6) )
+    fig, axes = plt.subplots(2, 1, figsize = (14,6.5) )
     ax = axes[0] 
 
     to = int(-nfire*p_nf.RI/p_nf.dt_p)
@@ -113,7 +116,7 @@ def canopy_compare(p_wf, p_nf, nfire = 1000, title = ""):
     if G_l_postfire > 0:
         ax.axhline(p_nf.mean_G_l(), ls = '--', lw = 1, c = c_l)
 
-    ax.set_title(title)
+    
     
     
 
