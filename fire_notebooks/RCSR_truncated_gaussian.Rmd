@@ -25,34 +25,6 @@ startup_file = "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 run "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 ```
 
-```{python}
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import pandas as pd
-# # %matplotlib inline
-# import sys
-# import time
-# import itertools
-# import multiprocessing as mp
-# import copy
-# import math
-# from statsmodels.graphics.tsaplots import plot_acf
-# import scipy
-# sys.path.append("/Users/octavia/Dropbox/fire/fire_code/" )
-
-# mymodules = ['plot_config', "fire_model", "fire_plot", "fire_analytic" ]
-
-# for mod in mymodules:
-#     if mod in sys.modules:
-#         del sys.modules[mod]
-
-
-# from plot_config import *
-# from fire_model import *
-# from fire_analytic import *
-# from fire_plot import *
-```
-
 ## Are we sampling severity in a sensible way?
 
 ```{python}

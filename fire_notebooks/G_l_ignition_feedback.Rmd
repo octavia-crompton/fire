@@ -25,7 +25,7 @@ startup_file = "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 run "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 ```
 
-## The $G_l$-fire feedback
+## The $G_l$-ignition feedback
 
  Assume that return time linearly decreases as G_l increases
 
