@@ -1,12 +1,14 @@
 */__pycache__
 .DS_Store
-*.ipynb
+# *.ipynb
 *.ipynb_checkpoints
 *.pkl
 *.Rhistory
 fire_analytic/*
 
 !fire_analytic/analytic_two_layer.tex
+!fire_analytic/analytic_two_layer.pdf
 fire_mathematica/
 fire_writing/
 ref_fire/
+fire_notebooks_v0/

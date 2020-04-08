@@ -1,18 +1,6 @@
 
-
-###  Next steps and issues
-
--  dimensionless groups
-
--  things are converging with an error
-  -  see `Stability : Things are slow to converge near the stability boundary`
-
--  `G_postfire(self)` does not need RI or severity.
-      - Is this function defined in `fire_analytic.py`?
-
-- how do results depend on the degree of correlation between layers?
-
-
+```
+```
 ### List of notebooks
 
 
@@ -76,3 +64,17 @@ Version 1 of the RCSR model
 - `plot_config.py`
 
 - `startup.py`
+
+
+
+###  Next steps and issues
+
+-  dimensionless groups
+
+-  things are converging with an error
+  -  see `Stability : Things are slow to converge near the stability boundary`
+
+-  `G_postfire(self)` does not need RI or severity.
+      - Is this function defined in `fire_analytic.py`?
+
+- how do results depend on the degree of correlation between layers?
