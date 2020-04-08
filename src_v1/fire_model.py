@@ -726,8 +726,7 @@ def severity_sampler(n = 1e5, severity = 0.3, std_severity = 0.01,
     """
     Multivariate sampler to specify how the probability densities of 
     lower and upper fire severity are correlated. 
-    
-    
+     
     """
     n = int(n)
     np.random.seed(seed)
@@ -962,6 +961,9 @@ def compute_errors_mean(p):
     dfl = a.append(c).append(e).append(pe)
     
     return df, dfl    
+
+
+   
 
 ####################################################################
 ######################## UTILITIES #################################

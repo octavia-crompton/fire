@@ -125,7 +125,7 @@ def myround(x, precision):
     except:
         return x
         
-def compute_all_errors(all_sims, sim_dir):
+def compute_all_errors(all_sims, sim_dir, recomp = True):
     """
     Compute the errors for a list of RCSR instances, with
     regular ignition and severities
@@ -140,8 +140,11 @@ def compute_all_errors(all_sims, sim_dir):
         var_list = list(default_params().keys())
         param = pd.Series(vars(p))[var_list]
 
-        df, dfl = compute_errors(p)
-
+        if recomp == True:
+            df, dfl = compute_errors_mean(p)
+        else:
+            df, dfl = compute_errors(p)
+            
         dfl = dfl.append(param)
         res = res.append(dfl, ignore_index = True)
     res.index = all_sims.index

@@ -8,10 +8,19 @@ import copy
 import math
 
 """
-Plotting functions by `plot_output`
+Plotting functions
 """  
-def canopy_plot(p, nfire = 1000, title = ""):
+def canopy_plot(p, nfire = 100, title = ""):
     """
+    Plot lower and upper canopy biomass on the same axis
+
+    Parameters:
+    p  : RCSR instance
+       RCSR simulation
+    nfire : int
+        number of fires
+    title: str
+        plot title  
     """
     fig, ax = plt.subplots(1, figsize = (14,4) )
 
@@ -53,7 +62,9 @@ Canopy plot for "paired simulations"
 
 def canopy_compare(p_wf, p_nf, nfire = 1000, title = ""):
     """
-    Visual compare of two cases: with and without G_l feedback
+    Plot comparison of two cases: with and without G_l feedback
+
+
     """
     fig, axes = plt.subplots(2, 1, figsize = (14,6) )
     ax = axes[0] 
