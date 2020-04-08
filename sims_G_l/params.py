@@ -3,8 +3,8 @@ import numpy as np
 all_params = {
       "batch_dict" :    {               
         "beta" : [0.5],
-        "S" : [0.5, 0.2],
-        "alpha" :  [0.02, 0.04, 0.06],
+        "S" : [0.4, 0.2],
+        "alpha" :  [0.02, 0.06],
         "ignition_type" : ["G_l", "random"]
         },
       "sim_dict" : {        
@@ -19,8 +19,8 @@ all_params = {
             "dt" : 0.01,
             "dt_p" : 0.1, 
             "seed" : 0,
-            "ti" : 3000, 
-            "tmax" : 10000,
+            "ti" : 5000, 
+            "tmax" : 3000,
             "chi" : 1,
             "severity_type" : "random",
             "std_severity" : 0.1,

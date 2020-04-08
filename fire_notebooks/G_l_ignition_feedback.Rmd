@@ -229,14 +229,14 @@ def plot_grid_feedback(feedback_subset, random_subset, x_var, y_var):
     ax.set_xticks([], []);    
     ax, zplot = colormap(x,y, z, ax= ax)
     ax.set_ylabel("Severity")
-    ax.set_title(r"$\bar G_u$ with feedback ")
+    ax.set_title(r"$\bar G_u$ no feedback ")
     
     ax = axes[3]
     z = expand_z(np.array(maps["G_l_mean"]))
     ax, zplot = colormap(x,y, z, ax= ax)
     ax.set_yticks([], []);
     ax.set_xticks([], []);        
-    ax.set_title(r"$\bar G_l$ with feedback")
+    ax.set_title(r"$\bar G_l$ no feedback")
     
     
     return axes
