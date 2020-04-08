@@ -50,7 +50,7 @@ ax.set_xlabel("$G_l$")
 ax.set_ylabel("$p$(ignition)")
 ax.set_title("$p$(ignition)")
 fig.savefig(fig_dir + '/G_l_feedback.png', format='png', dpi=300, bbox_inches = "tight")
-## Add to writeup
+# The RI prescribed in the code is the minimum RI. The maximum ignition probabiliy is 1/RI.
 ```
 
 ## Simulation 
@@ -70,10 +70,177 @@ from params import all_params
 ```
 
 ```{python}
-all_sims = run_all_sims(all_params, file_dir)
+all_sims = read_all_sims(file_dir)
 ```
 
 ```{python}
+# res = compute_all_summary(all_sims, sim_dir)
+res = pd.read_pickle(sim_dir + "/summary.pkl")
+res.severity = np.round(res.severity,2)
+res.p = 1/res.RI 
+```
+
+```{python}
+print(all_params["batch_dict"])
+print(all_params["sim_dict"])
+```
+
+### Select a simulation `p` from the $G_l$ feedback simulations;  subset `res` to match that case, grouping by no feedback ( `random`) and  $G_l$ feedback.
+
+```{python}
+res_random = res[res.ignition_type == "random"]
+res_feedback = res[res.ignition_type == "G_l"]
+
+case = res_feedback[res_feedback.alpha == 0.04].iloc[0]
+
+random_subset = res_random[(res_random.alpha==case.alpha) & (res_random.beta == case.beta)]
+feedback_subset = res_feedback[(res_feedback.alpha==case.alpha) & (res_feedback.beta == case.beta)]
+
+
+key = case.name
+p = all_sims.loc[key].p
+
+```
+
+### Select from `random_subset` the no-feedback simulation that most closely matches `p`; save this 
+
+```{python}
+err_l = np.abs(random_subset.G_l_mean - case.G_l_mean)
+err_u = np.abs(random_subset.G_u_mean - case.G_u_mean)
+random_subset["err_l"] = err_l
+random_subset["err_u"] = err_u
+random_subset["err"] = np.sqrt(err_u**2 + err_l**2)
+
+
+tol = 0.1
+match= random_subset[(err_l  < tol) & (err_u < tol)]
+if len(match) == 0:
+    print ("increase stop tol")
+    
+match_key = match[match['err'] == match['err'].min()].index[0]
+p_match = all_sims.loc[match_key]["p"]
+match_case = random_subset.loc[match_key]
+match_case[["err", "err_u", "err_l"]]
+```
+
+```{python}
+title = "No feedback : " + print_dict(case[["severity","RI"]]) + "\n $G_l$ Feedback : " + \
+            print_dict(match_case[["severity","RI"]]) 
+canopy_compare(p, p_match, nfire = 1000, title = title)
+# what is the "average" trajectory?
+```
+
+```{python}
+
+compare = pd.DataFrame({"no_feedback" : match_case, "G_l_feedback" : case })
+compare.loc["p"] = 1/compare.loc["RI"]
+compare.where(compare.G_l_feedback != compare.no_feedback).dropna().round(2)
+```
+
+```{python}
+
+def format_axes(x_var, y_var, ax):
+    
+    label_dict = {
+            "RI" : "min $RI$",
+            "p" : "max $p$",
+            "RI_c" : "actual $RI$",
+            "G_u_mean" : r"$\hat G_u$",
+             "G_l_mean" : r"$\hat G_l$"
+    
+            }
+    
+    ax.set_ylabel(label_dict[y_var])
+    ax.set_xlabel(label_dict[x_var])
+    ax.set_xticklabels("")
+    ax.set_yticklabels("")
+    return ax
+```
+
+```{python}
+
+fig, axes = plt.subplots(1,4 , figsize = (16,4))
+axes= axes.ravel()
+alpha = 1
+plot_vars = [["RI", "RI_c"],
+            ["p", "RI_c"],
+            ["p", "G_l_mean"],
+             ["G_u_mean", "G_l_mean"]
+            ]
+
+for i, ax in enumerate(axes[:len(plot_vars)]):
+    x_var, y_var = plot_vars[i]
+    ax.scatter(random_subset[x_var], random_subset[y_var],
+               alpha = alpha, label = "random")
+    ax.scatter(feedback_subset[x_var], feedback_subset[y_var],
+               alpha = alpha, label = "feedback")
+
+    format_axes(x_var, y_var, ax)
+
+axes[0].legend()
+
+```
+
+```{python}
+
+```
+
+```{python}
+
+for i, d in enumerate(p.record.year[:-1]):
+    start = round(d)
+    end = int(round(d + p.record.time_past_fire[i+1] - 2/p.dt_p))
+    plt.plot(p.G_u_list[start:end])
+```
+
+```{python}
+
+fig, axes = plt.subplots(1,2, figsize = (10,4))
+ax = axes[0]
+bins = np.arange(0, 100, 5)
+bins = ax.hist(p_match.record.time_past_fire, bins, label = "no feedback");
+ax.hist(p.record.time_past_fire, bins[1], alpha= 0.5, label = "$G_l$ feedback");
+ax.legend()
+ax.set_title("Histogram of $RI$ values")
+
+ax = axes[1]
+bins = ax.hist(p_match.record.G_u_max, 20,  label = "no feedback");
+ax.hist(p.record.G_u_max, bins[1], alpha= 0.5, label = "$G_l$ feedback");
+ax.legend()
+ax.set_title("Histogram of $G_{u,max}$ values")
+
+```
+
+```{python}
+p.record["u_removed"] = p.record.G_u_max*p.record.u_severity
+p.record["l_removed"] = p.record.G_l_max*p.record.l_severity
+
+p_match.record["u_removed"] = p_match.record.G_u_max*p.record.u_severity
+p_match.record["l_removed"] = p_match.record.G_l_max*p.record.l_severity
+
+```
+
+```{python}
+## Biomass removed
+fig, axes = plt.subplots(1,2, figsize = (10,4))
+ax = axes[0]
+# bins = np.arange(0, 100, 5)
+bins = ax.hist(p_match.record.u_removed, 20, label = "no feedback");
+ax.hist(p.record.u_removed, bins[1], alpha= 0.5, label = "$G_l$ feedback");
+# ax.legend() 
+ax.set_title("Histogram of \n upper canopy biomass removed")
+
+ax = axes[1]
+bins = ax.hist(p_match.record.l_removed, 20,  label = "no feedback");
+ax.hist(p.record.l_removed, bins[1], alpha= 0.5, label = "$G_l$ feedback");
+ax.legend()
+ax.set_title("Histogram of \n lower canopy biomass removed")
+```
+
+# Illustrates feedback without matching
+
+```{python}
+
 p = RCSR()
 # params = default
 update = {
@@ -84,7 +251,7 @@ update = {
           "RI" : 20,
           "severity" : 0.80,
           "severity_type" : "random",
-          "ignition_type" : "G_l,          
+          "ignition_type" : "G_l",          
           "sigma_phi" : 0.01,
           "seed" : 0,
           "chi" : 1,
@@ -101,15 +268,7 @@ update_fix["ignition_type"] = "random"
 p1 = RCSR(update_fix)
 p1.run()
 
-
-```
-
-```{python}
 canopy_plot(p1, nfire = 100, title = "No feedback")
-
-```
-
-```{python}
 canopy_plot(p, nfire = 100, title = "$G_l$ feedback")
 ```
 
@@ -128,204 +287,6 @@ ax.hist(p.record.G_u_max, bins[1], alpha= 0.5, label = "$G_l$ feedback");
 ax.legend()
 ax.set_title("Histogram of $G_{u,max}$ values")
 
-```
-
-```{python}
-res = pd.DataFrame()
-
-for RI in np.arange(5, 50, 1):
-    p = RCSR()
-    update = {
-              "r_l" : 0.9,
-              "r_u" : 0.15,           
-              "alpha" : 0.02,
-              "beta" : 0.5,
-              "ti" : 2000, 
-              "tmax" : 5000,
-              "RI" : RI,
-              "severity" : 0.80,
-              "dt" : 0.01,
-              "dt_p" : 0.1,
-              "severity_type" : "random",
-              "ignition_type" : "G_l",          
-              "sigma_phi" : 0.1,
-              "seed" : 0,
-              "chi" : 2,
-              "S" : 0.2
-             }
-
-
-    p = RCSR(update)
-    p.run()
-    l = list(update.keys())
-
-    df, dfl = compute_errors_mean(p)
-    update.update(np.abs(dfl))
-
-    res = res.append(update, ignore_index = True)
-    
-    update_fix = update.copy()
-    update_fix["ignition_type"] = "random"
-    p1 = RCSR(update_fix)
-    p1.run()
-
-    df, dfl = compute_errors_mean(p1)
-    update_fix.update(np.abs(dfl))
-
-    res = res.append(update_fix, ignore_index = True)
-    
-    [l.append(d) for d in ["G_u_mean_c", "G_l_mean_c", "RI_c"]]
-```
-
- On the axis is the ignition probability when the lower canopy reaches the carrying capacity; in the no feedback case, the ignition probability is also constant and equal to this value.
- 
-
-```{python}
-res_random = res[res.ignition_type == "random"]
-res_feedback = res[res.ignition_type == "G_l"]
-
-fig, axes = plt.subplots(1,4 , figsize = (16,4))
-axes= axes.ravel()
-
-ax = axes[0]
-ax.scatter(res_random["G_l_mean_c"], res_random["G_u_mean_c"], alpha =0.5)
-ax.scatter(res_feedback["G_l_mean_c"], res_feedback["G_u_mean_c"], alpha =0.5)
-
-ax.set_ylabel("$G_u$")
-ax.set_xlabel("$G_l$")
-
-ax = axes[1]
-ax.scatter(1/res_random["RI"], res_random["RI_c"], label = "no feedback", alpha =0.5)
-ax.scatter(1/res_feedback["RI"], res_feedback["RI_c"], label = "$G_l$ feedback", alpha =0.5)
-ax.set_ylabel("RI")
-ax.set_xlabel("$p(G_l = k_l)$")
-
-ax = axes[2]
-ax.scatter(1/res_random["RI"], res_random["G_u_mean_c"], label = "no feedback", alpha =0.5)
-ax.scatter(1/res_feedback["RI"], res_feedback["G_u_mean_c"], label = "$G_l$ feedback", alpha =0.5)
-ax.set_ylabel("$G_u$")
-ax.set_xlabel("$p(G_l = k_l)$")
-
-ax = axes[3]
-ax.scatter(1/res_random["RI"], res_random["G_l_mean_c"], label = "no feedback", alpha =0.5)
-ax.scatter(1/res_feedback["RI"], res_feedback["G_l_mean_c"], label = "$G_l$ feedback", alpha =0.5)
-ax.set_ylabel("$G_l$")
-ax.set_xlabel("$p(G_l = k_l)$")
-ax.legend()
-# Once you get rid of the lower canopy, without the ignition feedback, the actual ignition 
-# proability is much smaller.
-
-```
-
-```{python}
-res_random = res[res.ignition_type == "random"]
-res_feedback = res[res.ignition_type == "G_l"]
-
-fig, axes = plt.subplots(1,2 , figsize = (8,4), sharey = True,sharex = True)
-axes= axes.ravel()
-
-ax = axes[0]
-ax.scatter(res_random["p"], res_random["G_u_mean_c"], label = "$G_u$", alpha =1)
-ax.scatter(res_random["p"], res_random["G_l_mean_c"], label = "$G_l$", alpha =1)
-ax.set_title("No feedback")
-ax.set_xlabel("$p$")
-ax.set_ylabel("biomass")
-ax.legend()
-
-ax = axes[1]
-ax.scatter(res_feedback["p"], res_feedback["G_u_mean_c"], label = "$G_u$", alpha =1)
-ax.scatter(res_feedback["p"], res_feedback["G_l_mean_c"], label = "$G_l$", alpha =1)
-ax.set_title("$G_l$ feedback")
-ax.set_xlabel("$p$")
-ax.set_ylabel("biomass")
-ax.set_xlim(0.025, 0.05)
-# probability here is showing the maximum probability, with G_l = k_l
-# what is G_l at the time of each ignition
-```
-
-```{python}
-feedback_case =  res_feedback[(res_feedback["RI"] > 10)].iloc[0]
-
-feedback_case = res_feedback.loc[(res_feedback.G_l_mean_c > 1) & (res_feedback.G_u_mean_c > 1)].iloc[5]
-
-RI_wf = feedback_case["RI_c"]
-difference = (abs(res_random[fld]   -float( res_feedback[(res_feedback["RI_c"] > RI_wf)].iloc[0]["RI_c"])))
-random_case = res_random.iloc[np.where(difference == np.min(difference))[0][0]]
-compare = pd.DataFrame({"no_feedback" : random_case[l], "G_l_feedback" : feedback_case[l] })
-compare.loc["p"] = 1/compare.loc["RI"]
-```
-
-```{python}
-compare.where(compare.G_l_feedback != compare.no_feedback).dropna().round(2)
-```
-
-```{python}
-update = dict(random_case[l])
-p_nf = RCSR(update)
-p_nf.run()
-
-update = dict(feedback_case[l])
-p_wf = RCSR(update)
-p_wf.run()
-
-
-```
-
-```{python}
-
-for i, d in enumerate(p_wf.record.year[:30]):
-    start = round(d)
-    end = int(round(d + p_wf.record.time_past_fire[i+1] - 2/p_wf.dt_p))
-    plt.plot(p_wf.G_l_list[start:end])
-```
-
-```{python}
-canopy_compare(p_wf, p_nf, nfire = 1000, title = "")
-# what is the "average" trajectory?
-```
-
-```{python}
-
-fig, axes = plt.subplots(1,2, figsize = (10,4))
-ax = axes[0]
-bins = np.arange(0, 100, 5)
-bins = ax.hist(p_nf.record.time_past_fire, bins, label = "no feedback");
-ax.hist(p_wf.record.time_past_fire, bins[1], alpha= 0.5, label = "$G_l$ feedback");
-ax.legend()
-ax.set_title("Histogram of $RI$ values")
-
-ax = axes[1]
-bins = ax.hist(p_nf.record.G_u_max, 20,  label = "no feedback");
-ax.hist(p_wf.record.G_u_max, bins[1], alpha= 0.5, label = "$G_l$ feedback");
-ax.legend()
-ax.set_title("Histogram of $G_{u,max}$ values")
-
-```
-
-```{python}
-p_wf.record["u_removed"] = p_wf.record.G_u_max*p_wf.record.u_severity
-p_wf.record["l_removed"] = p_wf.record.G_l_max*p_wf.record.l_severity
-
-p_nf.record["u_removed"] = p_nf.record.G_u_max*p_wf.record.u_severity
-p_nf.record["l_removed"] = p_nf.record.G_l_max*p_wf.record.l_severity
-
-```
-
-```{python}
-## Biomass removed
-fig, axes = plt.subplots(1,2, figsize = (10,4))
-ax = axes[0]
-# bins = np.arange(0, 100, 5)
-bins = ax.hist(p_nf.record.u_removed, 20, label = "no feedback");
-ax.hist(p_wf.record.u_removed, bins[1], alpha= 0.5, label = "$G_l$ feedback");
-# ax.legend() 
-ax.set_title("Histogram of \n upper canopy biomass removed")
-
-ax = axes[1]
-bins = ax.hist(p_nf.record.l_removed, 20,  label = "no feedback");
-ax.hist(p_wf.record.l_removed, bins[1], alpha= 0.5, label = "$G_l$ feedback");
-ax.legend()
-ax.set_title("Histogram of \n lower canopy biomass removed")
 ```
 
 ```{python}

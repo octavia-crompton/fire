@@ -12,8 +12,6 @@ jupyter:
     name: fire3
 ---
 
-#### Code to test the analytical solution with constant RI and fixed severity
-
 ```{python}
 # %autosave 0
 ```
@@ -27,11 +25,34 @@ startup_file = "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 run "/Users/octavia/Dropbox/fire/src_v1/startup.py"
 ```
 
-## Read parameter file
+```{python}
+params = default_params()
+
+update = {
+          "alpha" : 0.05,
+          "RI" : 20,
+          "severity" : 0.70,
+          "severity_type" : "random",
+          "ignition_type" : "random",          
+         }
+
+params.update(update)
+p = RCSR(update)
+p.run()
+
+
+```
+
+```{python}
+canopy_plot(p , nfire = 100)
+```
+
+
+
 
 ```{python}
 # Simulation batch
-sim_dir = project_dir + "/sims_analytic_check"
+sim_dir = project_dir + "/sims_random_check"
 file_dir = sim_dir + "/all_sims"
 if os.path.isdir(file_dir)  == False:
     os.mkdir(file_dir)
@@ -44,16 +65,11 @@ from params import all_params
 ```
 
 ```{python}
-# better to run from the command line as `call_fire.py`
-# all_sims = run_all_sims(all_params, file_dir)
-```
-
-```{python}
 all_sims = read_all_sims(file_dir)
 ```
 
 ```{python}
-res = compute_all_errors(all_sims, sim_dir, recomp = False)
+res = compute_all_errors(all_sims, sim_dir, recomp = True)
 ```
 
 ```{python}
@@ -61,7 +77,7 @@ res = pd.read_pickle(sim_dir + "/analytic_errs.pkl")
 ```
 
 ```{python}
-subset = res[(res.alpha==0.02)&(res.r_l == 1.5) & (res.beta == 0.6)]
+subset = res[(res.alpha==0.02)&(res.r_l == 1.5) & (res.beta == 0.2)]
 x_var = "RI"
 y_var = "severity"
 subset = subset.sort_values(by = [x_var, y_var])
@@ -75,20 +91,50 @@ axes[1, 0].plot(RIs, severities, '--' )
 
 ```
 
-## Check out a high error case
+## Where are the errors biggest?
 
 ```{python}
-## The errors are all acceptable
+
 x = res["G_l_mean_e"]
 cols = ["r_l", "alpha", "severity", "RI", "G_l_mean_a", "G_l_mean_c", "G_l_mean_e" ]
 high_error_case = res[x == np.max(x)]
 high_error_case[cols]
-high_error_case.index[0]
+
+
+```
+
+```{python}
 p = all_sims.loc[high_error_case.index[0]][0]
 ```
 
 ```{python}
-canopy_plot(p, 10)
+canopy_plot(p, 100)
+
+```
+
+```{python}
+compute_errors_mean(p)[0]
+```
+
+### Diagnostic plots for high-error  cases
+
+```{python}
+check_convergence(p, to = 0, slice = 100)
+
+```
+
+```{python}
+fig, axes = plt.subplots(1, 2, figsize = (14,4) )
+axes[0].hist(p.record.time_past_fire, 20, normed=True);
+y = np.arange(2, 100)
+lambda_RI = 1/p.RI
+axes[0].plot(y, lambda_RI*np.exp(-lambda_RI*y), label = "RI pdf")
+axes[0].set_title("Histograph of RIs")
+axes[0].set_xlabel("RI")
+
+axes[1].hist(p.record.u_severity, 20, normed=True);
+axes[1].set_title("Histograph of severities")
+axes[1].set_xlabel("severity")
 ```
 
 ```{python}
