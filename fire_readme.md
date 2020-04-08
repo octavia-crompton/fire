@@ -20,15 +20,6 @@
 - Assess sensitivity to varying soil moisture, growth-limiting factor, etc.
 
 
-`CRUR_analytic-random`
-- Similar test of the analytical solution over a  grid of parameters, but with random ignition and severity.
-- Saved to `random_RI_phi.pkl`
-
-`CRUR_truncated_gaussian` :
- - Check that calculations of the truncated Gaussian moments are correct.
- - Test whether _G\_u_ and _G\_l_ will eventually converge to the analytical approximate solutions.
-
-
 `Estimate_parameters` :
 - A notebook for estimating parameters for ICB and SLC
 
@@ -41,8 +32,16 @@
 - Tests the analytical solution with constant RI and severity (no randomness)
 
 
+`RCSR_analytic-random`
+-  Test the analytical solution over a  grid of parameters, with random ignition and severity.
+ - Test whether _G\_u_ and _G\_l_ will eventually converge to the analytical approximate solutions.
+
 `RCSR_illustrate`:
 -  Illustrative notebook showing a single parameter case.
+
+
+`RCSR_truncated_gaussian` :
+ - Check that calculations of the truncated Gaussian moments are correct.
 
 
 `Stability`
