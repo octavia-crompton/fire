@@ -10,12 +10,13 @@ import itertools as it
 import pandas as pd
 import numpy as np
 
-sys.path.append(os.path.dirname(__file__))
+
 from filepaths import *
 from fire_model import *
 
-name = "data"
+model_dir = os.path.dirname(__file__)
 
+name = "data"
 output_dir = os.path.join(project_dir, "model_output", name)
 sys.path.append(output_dir)
 
@@ -32,7 +33,7 @@ def run_all_sims():
     """
 
     file_dir = os.path.join(output_dir, "all_sims")
-    if os.path.isdir(file_dir) == False:
+    if not os.path.isdir(file_dir):
         os.mkdir(file_dir)
 
     if all_params['sim_dict'] == "ICB":
@@ -41,6 +42,7 @@ def run_all_sims():
         common_dict, batch_combos, sim_combos = interp_params(all_params)
 
     all_sims = []
+    sim_num = 0
 
     for bdict in batch_combos:
 
@@ -48,7 +50,9 @@ def run_all_sims():
                                for key in bdict.keys()])
 
         param_list = []
+
         for sdict in sim_combos:
+            sim_num += 1
             params = common_dict.copy()
             params.update(bdict)
             sim_name = ','.join(['-'.join([key, str(myround(sdict[key], 2))])
@@ -58,6 +62,9 @@ def run_all_sims():
             params["batch_name"] = batch_name
             params["sim_name"] = sim_name
             params["key"] = ",".join([batch_name, sim_name])
+
+            if common_dict["seed"] == "count":
+                params["seed"] = int(sim_num)
 
             param_list.append(params)
 
@@ -74,7 +81,6 @@ def run_all_sims():
 
     return df
 
-
 def read_ICB_params():
     """
     Interpret the `all_params` parameter dictionary
@@ -88,17 +94,15 @@ def read_ICB_params():
     """
 
     batch_dict = all_params['batch_dict']
-    # sim_dict = all_params['sim_dict']
     common_dict = all_params['common_dict']
 
-
-    IC = pd.read_csv(os.path.join(output_dir, "IC.csv"))
+    IC = pd.read_csv(os.path.join(model_dir, "IC.csv"))
     IC = np.array(IC)
 
-    # names = ["veg-{0:0.0f},S-{1:.1f}".format(ic[i][0],ic[i][1]) for i in range(len(ICs))]
     batch_vars = sorted(batch_dict)
+
     sim_vars = ['veg', 'S']
-    sim_dict = {'veg' : IC[:, 0], 'S' : IC[:, 1] }
+    # sim_dict = {'veg': IC[:, 0], 'S': IC[:, 1]}
     common_vars = sorted(common_dict)
 
     test_for_overlap(sim_vars, common_vars)
@@ -108,10 +112,9 @@ def read_ICB_params():
     batch_combos = [dict(zip(batch_vars, prod)) for prod in \
                     it.product(*(batch_dict[var_name] for var_name in batch_vars))]
 
-    sim_combos = [dict(zip(sim_vars, prod)) for prod in \
-                  it.product(*(sim_dict[var_name] for var_name in sim_vars))]
-
-    common_dict['IC'] = "ICB"
+    # sim_combos = [dict(zip(sim_vars, prod)) for prod in \
+    #               it.product(*(sim_dict[var_name] for var_name in sim_vars))]
+    sim_combos = [{'veg' : IC[i, 0], 'S' : np.round(IC[i, 1],3)} for i in range(len(IC))]
     return common_dict, batch_combos, sim_combos
 
 
@@ -130,9 +133,6 @@ def interp_params(all_params):
     batch_dict = all_params['batch_dict']
     sim_dict = all_params['sim_dict']
     common_dict = all_params['common_dict']
-
-    if sim_dict == "ICB":
-        ICs = np.load(os.join(output_dir, "IC.csv"))
 
     batch_vars = sorted(batch_dict)
     sim_vars = sorted(sim_dict)

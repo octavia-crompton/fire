@@ -15,7 +15,7 @@ all_params = {
             "r_l" : 1.5,
             "dt" : 0.01,
             "dt_p" : 0.1,            
-            "seed" : 0,
+            "seed" : "count",
             "ti" : 1,
             "tmax" : 100,
             "ignition_type" : "random",                              
@@ -25,7 +25,8 @@ all_params = {
             "chi" : 1,
             "r" : 0.5, 
             "a" : 0.01,
-            "b" : 0.99
+            "b" : 0.99,
+            "init" : "ICB"
              }
     }
 

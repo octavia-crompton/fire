@@ -66,8 +66,6 @@ def canopy_compare(p_wf, p_nf, nfire = 1000, title = ""):
 
     Parameters
     -----------
-
-
     """
     fig, axes = plt.subplots(2, 1, figsize = (14,6.5) )
     ax = axes[0] 

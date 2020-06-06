@@ -1,13 +1,9 @@
+import os
+
 import numpy as np
 import pandas as pd
-import os
-import time
-import itertools
-import multiprocessing as mp
-import copy
-import math
 import scipy
-from fire_analytic import *
+import scipy.special
 
 
 class RCSR:
@@ -18,13 +14,13 @@ class RCSR:
     def __init__(self, params = None):
         """
         """
-        if not params:
-            params = default_params(params)
+
+        params = default_params(params)
 
         for k, v in params.items():
              setattr(self, k, v)
 
-        if self.IC == "ICB":
+        if self.init == "ICB":
             if self.veg == 1:
                 self.G_uo = self.k_u*0.9
                 self.G_lo = self.k_l/10.
@@ -48,8 +44,8 @@ class RCSR:
         self.cat_severity = 0
         self.t = 0
         self.RI = int(self.RI)
-        if self.severity:
-            self.severity = round(self.severity, 4)
+
+
         self.p = 1/self.RI
         self.times = np.arange(0, self.tmax+self.ti +self.dt) 
         self.t_p = np.arange(self.ti, self.tmax + self.ti + self.dt_p, 
@@ -72,6 +68,8 @@ class RCSR:
         self.n_fires = len(self.ignition_list) 
         
         if self.severity_type == "random":
+            self.severity = np.round(self.severity, 4)
+
             self.severity_list = severity_sampler(n = self.n_fires, 
                                            std_severity = self.std_severity,
                                            severity = self.severity,
@@ -80,13 +78,14 @@ class RCSR:
             np.random.seed(int(self.seed) )
             np.random.shuffle(self.severity_list)
 
-        elif self.severity_type == "fixed": 
+        elif self.severity_type == "fixed":
+            self.severity = np.round(self.severity, 4)
             self.severity_list = np.ones([self.n_fires,2])*self.severity
 
         elif self.severity_type == "sample" :
             model_dir = os.path.dirname(__file__)
-            severity_dir =os.path.join(model_dir, "severity.csv")
-            severities = np.loadtxt(severity_dir)
+            severity_csv =os.path.join(model_dir, "severity.csv")
+            severities = np.loadtxt(severity_csv)
             severities = np.tile(severities, (2,1)).T
             self.severity_list = severities
             self.severity = np.mean(severities)
@@ -250,7 +249,8 @@ class RCSR:
         
         if self.ignition_type == "random":
             p = self.ignite_threshold()
-        elif self.ignition_type == "G_l":
+        else:
+            assert self.ignition_type == "G_l"
             p = self.G_l_ignite_threshold()            
 
         if ignite < p:            
@@ -566,7 +566,7 @@ class RCSR:
         r_lp = self.r_l*self.S**self.beta 
         k_l = self.k_l 
 
-        G_l_eq = k_l*(1- alpha*G_u_max/r_lp)    
+        G_l_eq = k_l*(1- self.alpha*G_u_max/r_lp)
         
         return max(G_l_eq,0)
 
@@ -706,7 +706,7 @@ class RCSR:
         return np.nanmin(deriv)
 
 
-def default_params(update = {}):
+def default_params(update = None ):
     """
     Contains default parameters values, which the dictionary 
     `update` will overwrite.
@@ -714,6 +714,7 @@ def default_params(update = {}):
     Useful for rapidly re-initializing stuff
     RCSR uses this function to initialize parameter values
     """
+
     params =  {
         "alpha" : 0.05,
         "beta" : 0.5,
@@ -733,14 +734,14 @@ def default_params(update = {}):
         "severity_type" : "fixed",
         "severity" : 0.5,
         "std_severity" : 0.1,
-        "r" : 0.5, 
+        "chi" : 1,
+        "r" : 0.5,
         "a" : 0.01,
         "b" : 0.99,
-        "IC" : 0
-
-    } 
-
-    params.update(update)
+        "init" : 0
+    }
+    if update is not None:
+        params.update(update)
     return params
 
 def runmodel(param):
@@ -750,9 +751,9 @@ def runmodel(param):
     return p
 
 
-###########################################################################
-####################### Code to sample severity ###########################
-###########################################################################
+"""
+ Code to sample severity
+"""
 def severity_sampler(n = 1e5, severity = 0.3, std_severity = 0.01,
                         r =0.5, seed = 0, include = False,
                         a = 0, b= 1):

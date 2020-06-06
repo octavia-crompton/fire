@@ -9,6 +9,8 @@ import os
 To run simulations from a param file, `batch_fire.py`
 """
 
+
+
 def interp_params(all_params):
     """
     Interpret the `all_params` parameter dictionary 
@@ -132,18 +134,16 @@ def compute_all_errors(all_sims, sim_dir, recomp = True):
     """
     Compute the errors for a list of RCSR instances, with
     regular ignition and severities
-
-    TODO: DOCUMENT THIS SILLINESS
-    TODO: ADD TO PYCHARM project
     
     """
     res = pd.DataFrame()
 
     for key in all_sims.index:
 
-        p = all_sims.loc[key][0]
+        p = all_sims.loc[key].p
 
         var_list = list(default_params().keys())
+        var_list= list(set(var_list) - set(vars(p)))
         param = pd.Series(vars(p))[var_list]
 
         if recomp == True:
@@ -153,6 +153,7 @@ def compute_all_errors(all_sims, sim_dir, recomp = True):
             
         dfl = dfl.append(param)
         res = res.append(dfl, ignore_index = True)
+
     res.index = all_sims.index
     res.to_pickle(sim_dir + "/analytic_errs.pkl")
     return res    
