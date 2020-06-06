@@ -1,11 +1,12 @@
+### Veg Classifications
 
-# Contents
-
-- `fire_analytic`
-  - math writeup
-
-
-
+  0 - Rock and water
+  1 - Conifer-dominated
+  2 - Shrub-dominated
+  3 - Sparse meadow
+  4 - Dense meadow
+  5 - Aspen
+  
 ### Notebooks in `fire_notebooks`
 
 - `analytic-dS.ipynb` :
@@ -20,7 +21,7 @@
   - A notebook for estimating parameters for ICB and SLC
 
 - `G_l_ignition_feedback.ipynb` :
-- Explore potential feedbacks between G_l and ignition probability.
+- Explore potential feedbacks between G\_l and ignition probability.
 
 
 - `Parallel.ipynb`

@@ -1,6 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
+import os
 import time
 import itertools
 import multiprocessing as mp
@@ -15,10 +15,11 @@ class RCSR:
     Contains the two layer fire model 
     
     """
-    def __init__(self, params = {}):
+    def __init__(self, params = None):
         """
         """
-        params = default_params(params)
+        if not params:
+            params = default_params(params)
 
         for k, v in params.items():
              setattr(self, k, v)
@@ -35,10 +36,11 @@ class RCSR:
         else:
             self.G_uo = self.k_u/10.
             self.G_lo = self.k_l/10.
-            self.G_u = self.G_uo
-            self.G_l = self.G_lo       
-            self.G_u_list = [self.G_uo]
-            self.G_l_list = [self.G_lo ]
+
+        self.G_u = self.G_uo
+        self.G_l = self.G_lo
+        self.G_u_list = [self.G_uo]
+        self.G_l_list = [self.G_lo ]
 
 
         self.fires = 0
@@ -46,7 +48,8 @@ class RCSR:
         self.cat_severity = 0
         self.t = 0
         self.RI = int(self.RI)
-        self.severity = round(self.severity, 4)
+        if self.severity:
+            self.severity = round(self.severity, 4)
         self.p = 1/self.RI
         self.times = np.arange(0, self.tmax+self.ti +self.dt) 
         self.t_p = np.arange(self.ti, self.tmax + self.ti + self.dt_p, 
@@ -80,8 +83,13 @@ class RCSR:
         elif self.severity_type == "fixed": 
             self.severity_list = np.ones([self.n_fires,2])*self.severity
 
-        elif self.severity_type == "draw" :
-            print ("to be developed")
+        elif self.severity_type == "sample" :
+            model_dir = os.path.dirname(__file__)
+            severity_dir =os.path.join(model_dir, "severity.csv")
+            severities = np.loadtxt(severity_dir)
+            severities = np.tile(severities, (2,1)).T
+            self.severity_list = severities
+            self.severity = np.mean(severities)
 
         self.record = pd.DataFrame(
                      columns = ["year", "time_past_fire", 
