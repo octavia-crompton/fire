@@ -22,11 +22,11 @@ all_params = {
             "tmax" : 1000,      
             "ignition_type" : "random",                              
             "severity_type" : "random",
-            "chi" : 1,
             "std_severity" : 0.1,
-            "r" : 0.5, 
+            "chi" : 1,
+            "r" : 0.5,
             "a" : 0.01,
-            "b" : 0.99
+            "b" : 0.99,
              }
     }
 

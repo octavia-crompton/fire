@@ -5,6 +5,10 @@ import pandas as pd
 import scipy
 import scipy.special
 
+param_vars = ['alpha', 'beta', 'k_u', 'k_l', 'r_u', 'r_l', 'S', 'dt', 'dt_p',
+              'seed', 'ti', 'tmax', 'RI', 'ignition_type', 'chi', 'severity_type',
+              'severity', 'std_severity', 'r', 'a', 'b', 'init']
+
 
 class RCSR:
     """
@@ -16,7 +20,6 @@ class RCSR:
     def __init__(self, params=None):
         """
         """
-
         params = default_params(params)
 
         for k, v in params.items():
@@ -25,10 +28,10 @@ class RCSR:
         if self.init == "ICB":
             if self.veg == 1:
                 self.G_uo = self.k_u * 0.9
-                self.G_lo = self.k_l / 10.
+                self.G_lo = self.k_l * 0.1
 
             elif self.veg == 2:
-                self.G_uo = self.k_u / 10.
+                self.G_uo = self.k_u * 0.1
                 self.G_lo = self.k_l * 0.9
 
         else:
@@ -292,11 +295,10 @@ class RCSR:
     def compute_statistics(self):
         """
         """
-
         to = np.where(self.t_p >= self.record.iloc[0]["year"])[0][0]
 
-        G_u_list = self.G_u_list[to:to + (int)(self.RI / self.dt_p)]
-        G_l_list = self.G_l_list[to:to + (int)(self.RI / self.dt_p)]
+        G_u_list = self.G_u_list[to:to + int(self.RI / self.dt_p)]
+        G_l_list = self.G_l_list[to:to + int(self.RI / self.dt_p)]
 
         self.G_u_min_c = np.min(G_u_list)
         self.G_u_mean_c = np.mean(G_u_list)
@@ -366,12 +368,12 @@ class RCSR:
         k = self.k_u
         r = self.r_u * self.S ** self.beta
 
-        if recomp == False:
+        if not recomp:
             RI = self.RI
         else:
             RI = self.record.time_past_fire.mean()
 
-        if recomp == False:
+        if not recomp:
             if self.severity_type == "random":
                 severity = predict_truncated_mean(
                     self.severity, self.std_severity, self.a, self.b)
@@ -433,7 +435,7 @@ class RCSR:
           G_l_mean =   k_lp ( 1 +  log(1- severity)/(r_lp*RI))
         """
 
-        if recomp == False:
+        if not recomp:
             RI = self.RI
         else:
             RI = self.record.time_past_fire.mean()
@@ -441,7 +443,7 @@ class RCSR:
         r_lp = self.r_lp(recomp)
         k_lp = self.k_lp(recomp)
 
-        if recomp == False:
+        if not recomp:
             if self.severity_type == "random":
                 severity = predict_truncated_mean(
                     self.severity, self.std_severity, self.a, self.b)
@@ -538,7 +540,6 @@ class RCSR:
         Assume G_l in steady state with G_u, and computes G_l in equilibrium with G_u_max. 
 
         """
-        RI = self.RI
         G_u_min = self.G_u_postfire()
         G_u_max = G_u_min / (1 - self.severity)
 
@@ -586,7 +587,7 @@ class RCSR:
         G_o : float
             initial biomass
         """
-        if G_o == None:
+        if G_o is None:
             G_o = self.G_uo
 
         k = self.k_u
@@ -695,7 +696,7 @@ def default_params(update=None):
     params = {
         "alpha": 0.05,
         "beta": 0.5,
-        "k_u": 20.,
+        "k_u": 60.,
         "k_l": 5.,
         "r_u": 0.25,
         "r_l": 1.5,
@@ -703,18 +704,17 @@ def default_params(update=None):
         "dt": 0.01,
         "dt_p": 0.1,
         "seed": 0,
-        "ti": 1000,
+        "ti": 0,
         "tmax": 3000,
         "RI": 60,
         "ignition_type": "fixed",
-        "chi": 1,
         "severity_type": "fixed",
         "severity": 0.5,
         "std_severity": 0.1,
+        "init": 0,
         "r": 0.5,
         "a": 0.01,
         "b": 0.99,
-        "init": 0
     }
     if update is not None:
         params.update(update)
@@ -762,7 +762,7 @@ def severity_sampler(n=1e5, severity=0.3, std_severity=0.01,
     x = x[:n]
     y = y[:n]
 
-    if include == True:
+    if include:
         return x, y
     else:
         return x
@@ -829,18 +829,15 @@ def compute_errors(p):
     """
     to = np.where(p.t_p >= p.record.iloc[0]["year"])[0][0]
 
-    G_u_list = p.G_u_list[to:to + (int)(p.RI / p.dt_p)]
+    G_u_list = p.G_u_list[to:to + int(p.RI / p.dt_p)]
     gamma = 0.8
-    threshold = (np.max(G_u_list) - np.min(G_u_list)) * gamma + np.min(G_u_list)
-    t_eq_c = len(np.where(G_u_list < threshold)[0]) * p.dt_p
 
     G_u_min_c = np.min(G_u_list)
     G_u_mean_c = np.mean(G_u_list)
 
-    G_l_min_c = np.min(p.G_l_list[to:to + (int)(p.RI / p.dt_p)])
-    G_l_mean_c = np.mean(p.G_l_list[to:to + (int)(p.RI / p.dt_p)])
-    G_l_max_c = G_l_min_c / (1 - p.severity)
-    G_l_min_a, G_l_max_a = p.predict_G_l()
+    G_l_min_c = np.min(p.G_l_list[to:to + int(p.RI / p.dt_p)])
+    G_l_mean_c = np.mean(p.G_l_list[to:to + int(p.RI / p.dt_p)])
+
     G_u_min_a, G_u_max_a = p.predict_G_u()
 
     df = pd.DataFrame({

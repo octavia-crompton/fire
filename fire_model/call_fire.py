@@ -36,7 +36,9 @@ def run_all_sims():
     if not os.path.isdir(file_dir):
         os.mkdir(file_dir)
 
-    if all_params['sim_dict'] == "ICB":
+    check_valid_params()
+
+    if all_params['sim_dict'] ==  {'init': 'ICB'}:
         common_dict, batch_combos, sim_combos = read_ICB_params()
     else:
         common_dict, batch_combos, sim_combos = interp_params(all_params)
@@ -53,20 +55,27 @@ def run_all_sims():
 
         for sdict in sim_combos:
             sim_num += 1
+
             params = common_dict.copy()
             params.update(bdict)
+
             sim_name = ','.join(['-'.join([key, str(myround(sdict[key], 2))])
                                  for key in sdict.keys()])
-
+            if common_dict["seed"] == "count":
+                params["seed"] = int(sim_num)
+                sim_name = ','.join(["seed-", str(sim_num), sim_name])
             params.update(sdict)
             params["batch_name"] = batch_name
             params["sim_name"] = sim_name
             params["key"] = ",".join([batch_name, sim_name])
 
-            if common_dict["seed"] == "count":
-                params["seed"] = int(sim_num)
+
 
             param_list.append(params)
+
+        unique_sim_names = len(np.unique(pd.DataFrame(param_list)["sim_name"]))
+        assert unique_sim_names == len(param_list)
+
 
         pool = Pool(processes=8)
         result = (pool.map(run_RCSR, param_list))
@@ -80,6 +89,36 @@ def run_all_sims():
                       columns=["p"])
 
     return df
+
+def flatten_nested(nested_dict):
+    """
+    Flattens a nested dictionary
+
+    Parameters
+    ----------
+    nested_dict
+
+    Returns
+    -------
+
+    """
+    flattened_dict = {}
+    for _, item in nested_dict.items():
+        for key, nested_item in item.items():
+            if type(nested_item) == list:
+                if len(nested_item) == 1:
+                    nested_item = nested_item[0]
+            flattened_dict[key] = nested_item
+
+    return pd.Series(flattened_dict)
+
+
+
+def check_valid_params():
+    flattened = flatten_nested(all_params)
+    if flattened["ignition_type"] == "G_u":
+        for p in ["a", "b", "chi", "r"]:
+            assert p  in flattened, " ".join([p ,"not in params"])
 
 def read_ICB_params():
     """
@@ -95,14 +134,13 @@ def read_ICB_params():
 
     batch_dict = all_params['batch_dict']
     common_dict = all_params['common_dict']
-
+    common_dict["init"] = "ICB"
     IC = pd.read_csv(os.path.join(model_dir, "IC.csv"))
     IC = np.array(IC)
 
     batch_vars = sorted(batch_dict)
 
     sim_vars = ['veg', 'S']
-    # sim_dict = {'veg': IC[:, 0], 'S': IC[:, 1]}
     common_vars = sorted(common_dict)
 
     test_for_overlap(sim_vars, common_vars)
@@ -112,9 +150,9 @@ def read_ICB_params():
     batch_combos = [dict(zip(batch_vars, prod)) for prod in \
                     it.product(*(batch_dict[var_name] for var_name in batch_vars))]
 
-    # sim_combos = [dict(zip(sim_vars, prod)) for prod in \
-    #               it.product(*(sim_dict[var_name] for var_name in sim_vars))]
-    sim_combos = [{'veg' : IC[i, 0], 'S' : np.round(IC[i, 1],3)} for i in range(len(IC))]
+
+    sim_combos = [{'veg' : IC[i, 0], 'S' : np.round(IC[i, 2],3)} for i in range(len(IC))]
+
     return common_dict, batch_combos, sim_combos
 
 
@@ -196,21 +234,6 @@ def save_object(obj, filename):
     with open(filename, 'wb') as output:
         pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
 
-
-def load_object(filename):
-    """
-    Parameters:
-    -----------
-    filename: str
-        location of saved `obj`
-
-    Usage:
-    -----
-        d = load_object('p.pkl')
-    """
-    with open(filename, 'rb') as input:
-        obj = pickle.load(input)
-    return obj
 
 
 def test_for_overlap(list1, list2):

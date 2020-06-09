@@ -114,9 +114,6 @@ def canopy_compare(p_wf, p_nf, nfire = 1000, title = ""):
     if G_l_postfire > 0:
         ax.axhline(p_nf.mean_G_l(), ls = '--', lw = 1, c = c_l)
 
-    
-    
-    
 
 def colormap(xc,yc, array, ax = '',
              colorbar = True,             
@@ -160,8 +157,8 @@ def colormap(xc,yc, array, ax = '',
 
     zplot = ax.pcolormesh( xc,yc, array,
                            norm = norm,
-                           cmap=cmap, alpha= 1);
-                                               
+                           cmap=cmap, alpha= 1)
+
     if colorbar == True:
         from mpl_toolkits.axes_grid1 import make_axes_locatable
         from matplotlib import ticker
@@ -179,11 +176,11 @@ def colormap(xc,yc, array, ax = '',
     ax.set_ylim(yc.min(), yc.max())
     ax.set_xlim(xc.min(), xc.max())
     if ax_ticks == False:
-        ax.set_xticks([], []);
-        ax.set_yticks([], []);
+        ax.set_xticks([], [])
+        ax.set_yticks([], [])
     else:
-        ax.set_xticks(xc[0,::int(xc.shape[1]/5)]);
-        ax.set_yticks(yc[::int(yc.shape[0]/5), 0]);    
+        ax.set_xticks(xc[0,::int(xc.shape[1]/5)])
+        ax.set_yticks(yc[::int(yc.shape[0]/5), 0])
     return ax, zplot
 
     
@@ -295,7 +292,7 @@ def plot_G_grid(subset, x_var, y_var):
 
     ax = axes[0, 0]
     z = expand_z(np.array(maps["G_u_mean_c"]))
-    ax.set_xticks([], []);    
+    ax.set_xticks([], [])
     ax, zplot = colormap(x,y, z, ax= ax)
     ax.set_ylabel("Severity")
     ax.set_title(r"$\bar G_u$  ")
@@ -303,8 +300,8 @@ def plot_G_grid(subset, x_var, y_var):
     ax = axes[0, 1]
     z = expand_z(np.array(maps["G_l_mean_c"]))
     ax, zplot = colormap(x,y, z, ax= ax)
-    ax.set_yticks([], []);
-    ax.set_xticks([], []);        
+    ax.set_yticks([], [])
+    ax.set_xticks([], [])
     ax.set_title(r"$\bar G_l$  ")
     
     ax = axes[1, 0]
@@ -317,7 +314,7 @@ def plot_G_grid(subset, x_var, y_var):
     ax = axes[1, 1]
     z = expand_z(np.array(maps["G_l_mean_e"]))
     ax, zplot = colormap(x,y, z, ax= ax)
-    ax.set_yticks([], []);
+    ax.set_yticks([], [])
     ax.set_title(r"$\bar G_l$ error")
     ax.set_xlabel("Return interval")
     
