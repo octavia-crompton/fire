@@ -93,6 +93,11 @@ class RCSR:
             self.severity_list = severities
             self.severity = np.mean(severities)
 
+            np.random.seed(int(self.seed))
+            np.random.shuffle(self.severity_list)
+            print(self.severity_list[0],)
+
+
         self.record = pd.DataFrame(
             columns=["year", "time_past_fire",
                      "G_u_max", "G_u_mean",
