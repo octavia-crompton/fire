@@ -90,6 +90,8 @@ class RCSR:
             severity_csv = os.path.join(model_dir, "severity.csv")
             severities = np.loadtxt(severity_csv)
             severities = np.tile(severities, (2, 1)).T
+            np.random.shuffle(severities[:, 1])
+            
             self.severity_list = severities
             self.severity = np.mean(severities)
 

@@ -1,7 +1,6 @@
 from fire_model import *
 import pickle
 import os
-
 """
 To run simulations from a param file, `batch_fire.py`
 """
