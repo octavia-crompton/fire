@@ -1,7 +1,6 @@
-
 import sys
 
-sys.path.append("/Users/octavia/Dropbox/fire/src_v1" )
+sys.path.append("/Users/octavia/Dropbox/fire/fire_model" )
 
 mymodules = ["plot_config", "fire_model", "fire_utility", "filepaths",
              "fire_plot", "fire_analytic" ]

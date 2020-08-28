@@ -2,13 +2,13 @@ import numpy as np
 
 all_params = {
       "batch_dict" :    {               
-        "beta" : [0.0],
-        "alpha" :  [0.02]
+        "beta" : [0.1, 0.2, 0.3, 0.4, 0.5],
+        "alpha" :  [  0.002, 0.003,0.004, 0.005,0.006, 0.007]  
         },
       "sim_dict" :
-          {"init" : "ICB"},
+          {"init" : "ICB_supress"},
       "common_dict" : {
-            "RI" : 20,
+            "RI" : 100,
             "k_u" : 60.0,
             "k_l" : 7.0,
             "r_u" : 0.15,

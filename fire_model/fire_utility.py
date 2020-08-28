@@ -7,7 +7,6 @@ To run simulations from a param file, `batch_fire.py`
 
 from multiprocessing import Pool
 
-
 def read_all_sims(file_dir):
     """
     Read all simulations in file_dir
@@ -15,6 +14,7 @@ def read_all_sims(file_dir):
     all_sims = []
 
     keys = os.listdir(file_dir)
+    keys = [key for key in keys if ".DS_Store" not in key]
     keys = [key.replace(".pkl", "") for key in keys]
 
     for key in keys:
@@ -23,9 +23,7 @@ def read_all_sims(file_dir):
         all_sims.append(p)
 
     df = pd.DataFrame(all_sims, index=keys, columns=["p"])
-    return df
-
-
+    return all_sims
 def myround(x, precision):
     """
     Round floats, ignore strings, etc.
@@ -64,11 +62,9 @@ def compute_all_errors(all_sims, sim_dir, recomp=True):
     res.to_pickle(sim_dir + "/analytic_errs.pkl")
     return res
 
-
 """
  Saving and loading fire sims
 """
-
 
 def load_object(filename):
     """
@@ -87,6 +83,9 @@ def load_object(filename):
 
 
 def print_all_params(all_params):
+    """
+    Print parameter file
+    """
     print('batch vars:')
     for key in all_params['batch_dict'].keys():
         print(' ', key, all_params['batch_dict'][key])
@@ -98,7 +97,6 @@ def print_all_params(all_params):
 """
 For viewing parameter files
 """
-
 
 def print_dict(d):
     """

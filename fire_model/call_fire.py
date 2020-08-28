@@ -1,6 +1,8 @@
 """
  Run the RCSR model for the parameter file located in `name`
 
+ TODO: (1) Call fire for longer model runs
+       (2) save batches, not lumped all
 """
 import sys
 import os
@@ -9,14 +11,14 @@ import pickle
 import itertools as it
 import pandas as pd
 import numpy as np
-
+import shutil
 
 from filepaths import *
 from fire_model import *
 
 model_dir = os.path.dirname(__file__)
 
-name = "data"
+name = "v_supress_fire_large_kl"
 output_dir = os.path.join(project_dir, "model_output", name)
 sys.path.append(output_dir)
 
@@ -24,7 +26,6 @@ if "params" in sys.modules:
     del sys.modules["params"]
 
 from params import all_params
-
 
 def run_all_sims():
     """
@@ -40,15 +41,16 @@ def run_all_sims():
 
     if all_params['sim_dict'] ==  {'init': 'ICB'}:
         common_dict, batch_combos, sim_combos = read_ICB_params()
+    elif all_params['sim_dict'] ==  {'init': 'ICB_supress'}:
+        common_dict, batch_combos, sim_combos = read_ICB_params()        
     else:
         common_dict, batch_combos, sim_combos = interp_params(all_params)
-
     all_sims = []
     sim_num = 0
 
     for bdict in batch_combos:
 
-        batch_name = ','.join(['-'.join([key, str(myround(bdict[key], 2))])
+        batch_name = ','.join(['-'.join([key, str(myround(bdict[key], 3))])
                                for key in bdict.keys()])
 
         param_list = []
@@ -63,32 +65,85 @@ def run_all_sims():
                                  for key in sdict.keys()])
             if common_dict["seed"] == "count":
                 params["seed"] = int(sim_num)
-                sim_name = ','.join(["seed-", str(sim_num), sim_name])
+                sim_name = ','.join(["seed-"+str(sim_num), sim_name])
             params.update(sdict)
             params["batch_name"] = batch_name
             params["sim_name"] = sim_name
             params["key"] = ",".join([batch_name, sim_name])
-
-
 
             param_list.append(params)
 
         unique_sim_names = len(np.unique(pd.DataFrame(param_list)["sim_name"]))
         assert unique_sim_names == len(param_list)
 
-
-        pool = Pool(processes=8)
+        print("Submitting " + batch_name )
+        pool = Pool()
         result = (pool.map(run_RCSR, param_list))
         pool.close()
-        for p in result:
-            save_object(p, file_dir + '/{0}.pkl'.format(p.key))
 
-        [all_sims.append(p) for p in result]
+        save_all = None
+        if save_all:
+            for p in result:
+                save_object(p, file_dir + '/{0}.pkl'.format(p.key))
+        else:
+            print(("saving 0"))
+            for p in result[:0]:
+                save_object(p, file_dir + '/{0}.pkl'.format(p.key))
+        all_sims = []
+        [all_sims.append(p) for p in result] 
 
-    df = pd.DataFrame(all_sims, index=[p.key for p in all_sims],
-                      columns=["p"])
+        # df = pd.DataFrame(all_sims, index=[p.key for p in all_sims],
+        #                   columns=["p"])
 
-    return df
+        res = compute_summary(all_sims)
+        save_object(res, os.path.join(output_dir , batch_name+ ".pkl"))
+
+
+
+    return all_sims
+
+def compute_summary(all_sims):
+
+    res = pd.DataFrame()
+
+    var_list = list(default_params().keys())
+    [var_list.append(d) for d in ["key", "batch_name"]]
+
+    for ind, p  in enumerate(all_sims):
+
+        param = pd.Series(vars(p))[var_list]
+
+        g_u =  p.G_u/p.k_u
+        g_l =  p.G_l/p.k_l
+
+        g_uo =  p.G_uo/p.k_u
+        g_lo =  p.G_lo/p.k_l
+        try:
+
+            results = pd.Series({
+                    "G_u" : p.G_u,
+                    "G_l" : p.G_l,
+                    "G_uo" : p.G_uo,
+                    "G_lo" : p.G_lo,
+                    "g_l" : g_l,
+                    "g_u" : g_u,
+                    "g_lo" : g_lo,
+                    "g_uo" : g_uo,
+                    'G_u_mean_c' : np.mean(p.G_u_list),
+                    'G_l_mean_c' : np.mean(p.G_l_list),
+                    'RI_actual' : p.RI_actual,
+                    "severity_list" : list(p.record.l_severity),
+                            })
+        except:
+                import pdb
+                pdb.set_trace()
+        param = param.append(results)
+
+
+        res = res.append(param, ignore_index = True)
+
+    res.index = res.key
+    return res
 
 def flatten_nested(nested_dict):
     """
@@ -134,8 +189,15 @@ def read_ICB_params():
 
     batch_dict = all_params['batch_dict']
     common_dict = all_params['common_dict']
-    common_dict["init"] = "ICB"
+    init = all_params['sim_dict']["init"]
+    common_dict["init"] = init
+    IC_file = os.path.join(model_dir, "IC.csv")
+    shutil.copy(IC_file, output_dir + "/IC_copy.csv")
     IC = pd.read_csv(os.path.join(model_dir, "IC.csv"))
+
+    sev_file = os.path.join(model_dir, "severity.csv")
+    shutil.copy(sev_file, output_dir + "/severity_copy.csv")
+
     IC = np.array(IC)
 
     batch_vars = sorted(batch_dict)
@@ -149,10 +211,13 @@ def read_ICB_params():
 
     batch_combos = [dict(zip(batch_vars, prod)) for prod in \
                     it.product(*(batch_dict[var_name] for var_name in batch_vars))]
-
-
-    sim_combos = [{'veg' : IC[i, 0], 'S' : np.round(IC[i, 2],3)} for i in range(len(IC))]
-
+    if init =="ICB":
+        sim_combos = [{'veg' : IC[i, 0], 'S' : np.round(IC[i, 2],3)} 
+            for i in range(len(IC))]
+    elif init =="ICB_supress":
+        sim_combos = [{'veg' : IC[i, 1], 'S' : np.round(IC[i, 2],3)} 
+            for i in range(len(IC))]
+        
     return common_dict, batch_combos, sim_combos
 
 
@@ -187,15 +252,11 @@ def interp_params(all_params):
     return common_dict, batch_combos, sim_combos
 
 
-def run_RCSR(update):
+def run_RCSR(params):
     """
     Run a single RCSR instance
     """
-    # params = default_params()
-    # params.update(update)
-    params = update
     p = RCSR(params)
-
     p.run()
 
     return p
@@ -212,7 +273,7 @@ def myround(x, precision):
 
 
 """
- Saving and loading fire sims
+ Save  fire sims
 """
 
 
@@ -233,7 +294,6 @@ def save_object(obj, filename):
     """
     with open(filename, 'wb') as output:
         pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
-
 
 
 def test_for_overlap(list1, list2):

@@ -1,12 +1,12 @@
 import os
-
 import numpy as np
 import pandas as pd
 import scipy
 import scipy.special
 
 param_vars = ['alpha', 'beta', 'k_u', 'k_l', 'r_u', 'r_l', 'S', 'dt', 'dt_p',
-              'seed', 'ti', 'tmax', 'RI', 'ignition_type', 'chi', 'severity_type',
+              'seed', 'ti', 'tmax', 'RI', 'ignition_type', 'chi', 
+              'severity_type',
               'severity', 'std_severity', 'r', 'a', 'b', 'init']
 
 
@@ -25,15 +25,16 @@ class RCSR:
         for k, v in params.items():
             setattr(self, k, v)
 
-        if self.init == "ICB":
+        if (self.init == "ICB") | (self.init =="ICB_supress"):
             if self.veg == 1:
-                self.G_uo = self.k_u * 0.9
+                self.G_uo = self.k_u * 0.9 
                 self.G_lo = self.k_l * 0.1
 
-            elif self.veg == 2:
+            elif (self.veg == 2) | (self.veg == 3):
                 self.G_uo = self.k_u * 0.1
                 self.G_lo = self.k_l * 0.9
-
+            else:
+                print (self.veg)
         else:
             self.G_uo = self.k_u / 10.
             self.G_lo = self.k_l / 10.
@@ -74,10 +75,10 @@ class RCSR:
             self.severity = np.round(self.severity, 4)
 
             self.severity_list = severity_sampler(n=self.n_fires,
-                                                  std_severity=self.std_severity,
-                                                  severity=self.severity,
-                                                  a=self.a, b=self.b,
-                                                  r=self.r, seed=0)
+                                                std_severity=self.std_severity,
+                                                severity=self.severity,
+                                                a=self.a, b=self.b,
+                                                r=self.r, seed=0)
             np.random.seed(int(self.seed))
             np.random.shuffle(self.severity_list)
 
@@ -91,13 +92,12 @@ class RCSR:
             severities = np.loadtxt(severity_csv)
             severities = np.tile(severities, (2, 1)).T
             np.random.shuffle(severities[:, 1])
-            
+
             self.severity_list = severities
             self.severity = np.mean(severities)
 
             np.random.seed(int(self.seed))
             np.random.shuffle(self.severity_list)
-            print(self.severity_list[0],)
 
 
         self.record = pd.DataFrame(
